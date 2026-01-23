@@ -1,0 +1,446 @@
+#!/bin/bash
+# Science Pipeline Deployment & Automation Script
+# Sets up the entire scientific production pipeline system
+
+set -e  # Exit on error
+
+echo "=================================================="
+echo "Science Production Pipeline - Deployment"
+echo "=================================================="
+echo ""
+
+# Configuration
+WORKSPACE_DIR="$HOME/science_workspace"
+PIPELINE_DIR="$HOME/science_pipeline"
+VENV_DIR="$PIPELINE_DIR/venv"
+ASSETS_DIR="$PIPELINE_DIR/ui_assets"
+LOG_DIR="$WORKSPACE_DIR/logs"
+
+# Colors for output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+log_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+# Step 1: Create directory structure
+create_directories() {
+    log_info "Creating directory structure..."
+    
+    mkdir -p "$WORKSPACE_DIR"/{studies,deliverables,archive,logs}
+    mkdir -p "$PIPELINE_DIR"/{backend,adapters,config,ui_assets}
+    mkdir -p "$ASSETS_DIR"/{glcce,digital_lab,book_lab,comic_engine}
+    
+    log_success "Directories created"
+}
+
+# Step 2: Setup Python environment
+setup_python_env() {
+    log_info "Setting up Python virtual environment..."
+    
+    python3 -m venv "$VENV_DIR"
+    source "$VENV_DIR/bin/activate"
+    
+    pip install --upgrade pip
+    pip install \
+        anthropic \
+        pyautogui \
+        opencv-python \
+        pytesseract \
+        pillow \
+        pyyaml \
+        aiofiles \
+        fastapi \
+        uvicorn \
+        schedule \
+        watchdog
+    
+    log_success "Python environment ready"
+}
+
+# Step 3: Install system dependencies
+install_dependencies() {
+    log_info "Installing system dependencies..."
+    
+    # Detect OS
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get update
+        sudo apt-get install -y \
+            tesseract-ocr \
+            scrot \
+            xdotool \
+            python3-tk
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install tesseract
+    else
+        log_warning "Please install tesseract-ocr manually for your OS"
+    fi
+    
+    log_success "Dependencies installed"
+}
+
+# Step 4: Create configuration files
+create_config() {
+    log_info "Creating configuration files..."
+    
+    cat > "$PIPELINE_DIR/config/pipeline.env" << 'EOF'
+# Science Pipeline Environment Configuration
+
+# API Keys
+export ANTHROPIC_API_KEY="your-api-key-here"
+
+# Tool Paths - UPDATE THESE TO YOUR ACTUAL SOFTWARE LOCATIONS
+export GLCCE_PATH="./glcce/glcce"
+export DIGITAL_LAB_PATH="./digital_lab/digital_lab"
+export BOOK_LAB_PATH="./book_lab/book_lab"
+export COMIC_ENGINE_PATH="./comic_engine/comic_engine"
+export DATALITE_PATH="./datalite/datalite"
+
+# Workspace
+export SCIENCE_WORKSPACE="$HOME/science_workspace"
+
+# Performance
+export MAX_CONCURRENT_STUDIES=3
+export MAX_AGENTS_PER_STUDY=6
+
+# Logging
+export LOG_LEVEL="INFO"
+EOF
+    
+    log_success "Configuration files created"
+    log_warning "Please edit $PIPELINE_DIR/config/pipeline.env to add your API key and tool paths"
+}
+
+# Step 5: Create systemd service for automation (Linux)
+create_systemd_service() {
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        log_info "Creating systemd service..."
+        
+        cat > "$HOME/.config/systemd/user/science-pipeline.service" << EOF
+[Unit]
+Description=Science Production Pipeline
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=$VENV_DIR/bin/python $PIPELINE_DIR/backend/science_pipeline.py --daemon
+Restart=on-failure
+RestartSec=10
+EnvironmentFile=$PIPELINE_DIR/config/pipeline.env
+
+[Install]
+WantedBy=default.target
+EOF
+        
+        systemctl --user daemon-reload
+        systemctl --user enable science-pipeline.service
+        
+        log_success "Systemd service created"
+        log_info "Start with: systemctl --user start science-pipeline.service"
+    else
+        log_warning "Systemd not available on this OS"
+    fi
+}
+
+# Step 6: Create launchd service for automation (macOS)
+create_launchd_service() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        log_info "Creating launchd service..."
+        
+        cat > "$HOME/Library/LaunchAgents/com.science.pipeline.plist" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.science.pipeline</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>$VENV_DIR/bin/python</string>
+        <string>$PIPELINE_DIR/backend/science_pipeline.py</string>
+        <string>--daemon</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+</dict>
+</plist>
+EOF
+        
+        launchctl load "$HOME/Library/LaunchAgents/com.science.pipeline.plist"
+        
+        log_success "Launchd service created"
+    fi
+}
+
+# Step 7: Create file watcher for auto-processing
+create_file_watcher() {
+    log_info "Creating file watcher script..."
+    
+    cat > "$PIPELINE_DIR/backend/file_watcher.py" << 'PYEOF'
+#!/usr/bin/env python3
+"""
+File watcher that auto-starts pipeline when files are dropped
+"""
+
+import time
+import asyncio
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+from pathlib import Path
+from science_pipeline import SciencePipelineOrchestrator
+
+class SourceFileHandler(FileSystemEventHandler):
+    def __init__(self, orchestrator):
+        self.orchestrator = orchestrator
+        self.pending_files = []
+        self.last_event_time = 0
+        
+    def on_created(self, event):
+        if event.is_directory:
+            return
+            
+        # Only process PDF, TXT, CSV files
+        if event.src_path.endswith(('.pdf', '.txt', '.csv', '.md')):
+            print(f"Detected new file: {event.src_path}")
+            self.pending_files.append(event.src_path)
+            self.last_event_time = time.time()
+    
+    async def check_and_process(self):
+        """Process files after a delay (in case multiple files being dropped)"""
+        while True:
+            await asyncio.sleep(5)  # Check every 5 seconds
+            
+            if self.pending_files and (time.time() - self.last_event_time > 10):
+                # No new files for 10 seconds, start processing
+                files = self.pending_files.copy()
+                self.pending_files.clear()
+                
+                print(f"\nProcessing {len(files)} source files...")
+                study_id = f"study_{int(time.time())}"
+                
+                try:
+                    await self.orchestrator.process_study(study_id, files)
+                    print(f"Study {study_id} complete!")
+                except Exception as e:
+                    print(f"Error processing study: {e}")
+
+async def main():
+    import os
+    workspace = os.environ.get('SCIENCE_WORKSPACE', './science_workspace')
+    watch_dir = Path(workspace) / 'input'
+    watch_dir.mkdir(exist_ok=True)
+    
+    print(f"Watching directory: {watch_dir}")
+    print("Drop source files here to auto-start pipeline...")
+    
+    orchestrator = SciencePipelineOrchestrator(workspace)
+    event_handler = SourceFileHandler(orchestrator)
+    
+    observer = Observer()
+    observer.schedule(event_handler, str(watch_dir), recursive=False)
+    observer.start()
+    
+    try:
+        await event_handler.check_and_process()
+    except KeyboardInterrupt:
+        observer.stop()
+    
+    observer.join()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+PYEOF
+    
+    chmod +x "$PIPELINE_DIR/backend/file_watcher.py"
+    log_success "File watcher created"
+}
+
+# Step 8: Create morning automation script
+create_morning_automation() {
+    log_info "Creating morning automation script..."
+    
+    cat > "$PIPELINE_DIR/backend/morning_run.sh" << 'EOF'
+#!/bin/bash
+# Morning automation - processes all pending studies
+
+source "$HOME/science_pipeline/config/pipeline.env"
+source "$HOME/science_pipeline/venv/bin/activate"
+
+WORKSPACE="${SCIENCE_WORKSPACE:-$HOME/science_workspace}"
+INPUT_DIR="$WORKSPACE/input"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+echo "=========================================="
+echo "Science Pipeline - Morning Run"
+echo "Time: $(date)"
+echo "=========================================="
+
+# Check for files in input directory
+file_count=$(find "$INPUT_DIR" -type f \( -name "*.pdf" -o -name "*.txt" -o -name "*.csv" \) | wc -l)
+
+if [ $file_count -eq 0 ]; then
+    echo "No source files found. Nothing to process."
+    exit 0
+fi
+
+echo "Found $file_count source files to process..."
+
+# Collect all files
+files=$(find "$INPUT_DIR" -type f \( -name "*.pdf" -o -name "*.txt" -o -name "*.csv" \))
+
+# Run pipeline
+python "$HOME/science_pipeline/backend/science_pipeline.py" $files
+
+# Move processed files to archive
+ARCHIVE_DIR="$WORKSPACE/archive/processed_$TIMESTAMP"
+mkdir -p "$ARCHIVE_DIR"
+mv "$INPUT_DIR"/* "$ARCHIVE_DIR/" 2>/dev/null
+
+echo "Processing complete! Deliverables ready."
+echo "Check: $WORKSPACE/deliverables/"
+
+# Optional: Send notification
+if command -v notify-send &> /dev/null; then
+    notify-send "Science Pipeline" "Morning run complete! $file_count studies processed."
+fi
+EOF
+    
+    chmod +x "$PIPELINE_DIR/backend/morning_run.sh"
+    log_success "Morning automation script created"
+}
+
+# Step 9: Setup cron job for morning automation
+setup_cron() {
+    log_info "Setting up cron job for 6 AM daily run..."
+    
+    # Add to crontab if not already present
+    (crontab -l 2>/dev/null | grep -v "science_pipeline/backend/morning_run.sh"; \
+     echo "0 6 * * * $PIPELINE_DIR/backend/morning_run.sh >> $LOG_DIR/morning_run.log 2>&1") | \
+     crontab -
+    
+    log_success "Cron job configured for 6 AM daily"
+}
+
+# Step 10: Create desktop shortcut for drop zone
+create_desktop_shortcut() {
+    log_info "Creating desktop shortcut..."
+    
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        cat > "$HOME/Desktop/Science-Pipeline-Drop.desktop" << EOF
+[Desktop Entry]
+Type=Application
+Name=Science Pipeline Drop Zone
+Comment=Drop research files here to process
+Exec=xdg-open $WORKSPACE_DIR/input
+Icon=folder
+Terminal=false
+EOF
+        
+        chmod +x "$HOME/Desktop/Science-Pipeline-Drop.desktop"
+    fi
+    
+    log_success "Desktop shortcut created"
+}
+
+# Step 11: Create quick start script
+create_quickstart() {
+    log_info "Creating quick start script..."
+    
+    cat > "$PIPELINE_DIR/quickstart.sh" << 'EOF'
+#!/bin/bash
+# Quick start for science pipeline
+
+source "$HOME/science_pipeline/config/pipeline.env"
+source "$HOME/science_pipeline/venv/bin/activate"
+
+echo "Science Production Pipeline"
+echo "=========================="
+echo ""
+echo "Options:"
+echo "1. Start file watcher (auto-process dropped files)"
+echo "2. Run manual study (provide files as arguments)"
+echo "3. View today's deliverables"
+echo "4. Check system status"
+echo ""
+read -p "Select option (1-4): " choice
+
+case $choice in
+    1)
+        echo "Starting file watcher..."
+        python "$HOME/science_pipeline/backend/file_watcher.py"
+        ;;
+    2)
+        shift
+        python "$HOME/science_pipeline/backend/science_pipeline.py" "$@"
+        ;;
+    3)
+        ls -lh "$SCIENCE_WORKSPACE/deliverables/"
+        ;;
+    4)
+        echo "Pipeline Status:"
+        pgrep -f "file_watcher.py" && echo "File watcher: RUNNING" || echo "File watcher: STOPPED"
+        echo "Studies today: $(find $SCIENCE_WORKSPACE/studies -maxdepth 1 -type d -newermt 'today' | wc -l)"
+        echo "Deliverables today: $(find $SCIENCE_WORKSPACE/deliverables -type f -newermt 'today' | wc -l)"
+        ;;
+esac
+EOF
+    
+    chmod +x "$PIPELINE_DIR/quickstart.sh"
+    log_success "Quick start script created"
+}
+
+# Main deployment flow
+main() {
+    echo ""
+    log_info "Starting deployment..."
+    echo ""
+    
+    create_directories
+    setup_python_env
+    install_dependencies
+    create_config
+    create_file_watcher
+    create_morning_automation
+    setup_cron
+    create_systemd_service
+    create_launchd_service
+    create_desktop_shortcut
+    create_quickstart
+    
+    echo ""
+    echo "=================================================="
+    log_success "Deployment Complete!"
+    echo "=================================================="
+    echo ""
+    echo "Next steps:"
+    echo "1. Edit configuration: $PIPELINE_DIR/config/pipeline.env"
+    echo "2. Add your ANTHROPIC_API_KEY"
+    echo "3. Set paths to your software tools (GLCCE, Digital Lab, etc.)"
+    echo "4. Capture UI element screenshots and save to $ASSETS_DIR/"
+    echo "5. Start the pipeline: $PIPELINE_DIR/quickstart.sh"
+    echo ""
+    echo "Your drop zone: $WORKSPACE_DIR/input"
+    echo "Morning automation runs at: 6:00 AM daily"
+    echo ""
+}
+
+# Run deployment
+main
