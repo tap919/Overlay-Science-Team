@@ -1,0 +1,65 @@
+[
+  {
+    "name": "PubChemPy",
+    "description": "Wrapper for PubChem PUG REST API; fetches compounds by name/SMILES.",
+    "category": "Compounds and Drugs",
+    "install": "pip install pubchempy",
+    "example": "import pubchempy as pcp; comps = pcp.get_compounds('aspirin', 'name')",
+    "docs": "https://pubchempy.readthedocs.io",
+    "github": "https://github.com/mcs07/PubChemPy"
+  },
+  {
+    "name": "Biopython",
+    "description": "Entrez module for NCBI APIs (PubMed, Gene, Protein); searches and fetches records.",
+    "category": "Literature and Databases",
+    "install": "pip install biopython",
+    "example": "from Bio import Entrez; handle = Entrez.efetch(db='pubmed', id='12345', retmode='xml')",
+    "docs": "https://biopython.org",
+    "github": "https://github.com/biopython/biopython"
+  },
+  {
+    "name": "biothings-client",
+    "description": "Client for BioThings APIs (MyGene.info, MyVariant.info); gene/variant queries.",
+    "category": "Gene and Variant Data",
+    "install": "pip install biothings-client",
+    "example": "from biothings_client import get_client; mg = get_client('gene'); results = mg.querymany(['TP53'], scopes='symbol')",
+    "docs": "https://docs.biothings.io",
+    "github": "https://github.com/biothings/biothings_client"
+  },
+  {
+    "name": "pybioportal",
+    "description": "Access to cBioPortal for cancer genomics data (mutations, studies).",
+    "category": "Cancer Genomics",
+    "install": "pip install pybioportal",
+    "example": "from pybioportal import DataHub; dh = DataHub(); mutations = dh.get_all_mutations_in_multiple_studies(study_ids=['msk_impact_2017'])",
+    "docs": "https://pybioportal.readthedocs.io",
+    "github": "https://github.com/asncd/pybioportal"
+  },
+  {
+    "name": "chembl-downloader",
+    "description": "Downloads ChEMBL drug data for target interactions.",
+    "category": "Chemistry and Drugs",
+    "install": "pip install chembl-downloader",
+    "example": "from chembl_downloader import download; download('molecule', '/path/to/dir')",
+    "docs": "https://chembl-downloader.readthedocs.io",
+    "github": "https://github.com/chembl/chembl-downloader"
+  },
+  {
+    "name": "scikit-bio",
+    "description": "Bioinformatics tools for sequences, phylogenetics (some API integrations).",
+    "category": "General Bioinformatics",
+    "install": "pip install scikit-bio",
+    "example": "from skbio import DNA; seq = DNA('ACGT')",
+    "docs": "https://scikit.bio",
+    "github": "https://github.com/biocore/scikit-bio"
+  },
+  {
+    "name": "biomart-py",
+    "description": "Wrapper for Ensembl BioMart API; gene/attribute queries.",
+    "category": "Genomics",
+    "install": "pip install biomart-py",
+    "example": "from biomart import Ensembl37; server = Ensembl37(); response = server.attributes( attributes=['ensembl_gene_id', 'external_gene_name'] )",
+    "docs": "https://pypi.org/project/biomart-py",
+    "github": "https://github.com/gramoli/biomart-py"
+  }
+]
