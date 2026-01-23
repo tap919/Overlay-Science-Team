@@ -1,0 +1,496 @@
+# IMPLEMENTATION ROADMAP: Complete Agentic Science System
+
+**Total Development Time:** 8 weeks  
+**Team Size:** 1-2 developers  
+**Deployment Target:** Docker + Cloudflare Workers  
+
+---
+
+## WEEK 1: Foundation & Backend Skeleton
+
+### Days 1-2: Project Setup
+- [ ] Initialize Git repo: `overlay365-science-factory`
+- [ ] Set up Python virtual environment
+- [ ] Create directory structure from architecture doc
+- [ ] Write `requirements.txt` (all dependencies)
+- [ ] Set up `.env.example` with required vars
+- [ ] Create `docker-compose.yml` (PostgreSQL, Redis, FastAPI, GROMACS)
+
+```bash
+git init
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+docker-compose up -d
+```
+
+### Days 3-4: Database & Core API
+- [ ] Implement `backend/config.py` (Settings class, paths)
+- [ ] Implement `backend/database.py` (SQLAlchemy models)
+  - ExecutionLog
+  - Agent
+  - WorkflowTemplate
+  - AgentLearning
+- [ ] Run migrations: `alembic init alembic && alembic upgrade head`
+- [ ] Test database connection
+
+### Days 5-6: FastAPI Skeleton
+- [ ] Implement `backend/main.py` core routes:
+  - GET / (health check)
+  - POST /api/v1/upload (file ingestion stub)
+  - POST /api/v1/execute (execution queuing stub)
+  - GET /api/v1/executions/{id} (status stub)
+  - GET /api/v1/agents (agent listing)
+- [ ] Test all endpoints with Postman/curl
+- [ ] Verify database reads/writes
+
+### Days 7-8: Agent Orchestrator Skeleton
+- [ ] Create `agents/base_agent.py` (BaseAgent class)
+  ```python
+  class BaseAgent:
+      def __init__(self, id, name, role, skills):
+      async def execute(self, inputs):
+      async def learn(self, outcome):
+      def update_skill(self, skill_type, delta):
+  ```
+- [ ] Create `agents/__init__.py` with agent registry
+- [ ] Create `agents/orchestrator.py` stub (AgentOrchestrator class)
+- [ ] Initialize 5 default agents in database
+
+**Deliverable:** Basic backend with no business logic, all endpoints respond
+
+---
+
+## WEEK 2: Source Ingestion Agent
+
+### Days 1-2: Input Handling
+- [ ] Implement `routes/upload.py`:
+  - File validation (type, size, format)
+  - Storage in `data/inputs/{study_id}/`
+  - Return upload metadata
+- [ ] Test file upload endpoint
+
+### Days 3-4: Source Ingester Agent
+- [ ] Implement `agents/ingester.py`:
+  ```python
+  async def execute(self, inputs: Dict):
+      # 1. Detect file types
+      # 2. Extract text from PDFs (pdfplumber)
+      # 3. Parse CSVs (pandas)
+      # 4. OCR images (EasyOCR)
+      # 5. Save: metadata.json, content.md, embeddings.pkl
+      # Return: {files_processed, quality_score}
+  ```
+- [ ] Test on 5 sample files (PDF, CSV, TXT, PNG, MD)
+- [ ] Verify output quality
+
+### Days 5-7: Orchestration Integration
+- [ ] Update `orchestrator.py`:
+  ```python
+  async def ingest_sources(self, study_id: str):
+      ingester = agents["ingester"]
+      inputs = load_input_files(study_id)
+      result = await ingester.execute(inputs)
+      await ingester.learn(ExecutionOutcome(success=True, duration=...))
+      return result
+  ```
+- [ ] Wire into `/api/v1/execute` pipeline (Stage 1)
+- [ ] Test end-to-end file upload → ingestion → database
+
+### Day 8: Testing & Polish
+- [ ] Add error handling & logging
+- [ ] Test with large files (edge cases)
+- [ ] Verify agent skill increments
+
+**Deliverable:** Ingest files, normalize, store. Agent skills increase post-execution.
+
+---
+
+## WEEK 3: Quantum Chaos Runner Agent
+
+### Days 1-3: GLCCE Integration
+- [ ] Create `tools/glcce_wrapper.py`:
+  ```python
+  class GLCCEWrapper:
+      async def design_ansatz(self, protein_size: int, depth: str):
+          # Design quantum circuit
+      async def run_vqe(self, circuit, iterations: int):
+          # Run GLCCE simulation
+      def parse_results(self, output):
+          # Extract metrics: energy, iterations, convergence
+  ```
+- [ ] Test GLCCE subprocess calls (mock if GLCCE not available)
+- [ ] Implement error handling (timeouts, invalid inputs)
+
+### Days 4-5: Quantum Runner Agent
+- [ ] Implement `agents/quantum_runner.py`:
+  ```python
+  async def execute(self, inputs: Dict):
+      # 1. Detect if VQE/QAOA applicable
+      # 2. Design ansatz (based on protein size)
+      # 3. Tune hyperparameters
+      # 4. Submit to GLCCE
+      # 5. Monitor convergence
+      # 6. Extract chaos metrics (Lyapunov, CVaR)
+      # Return: {final_energy, iterations, convergence_plot, metrics.json}
+  ```
+- [ ] Implement learning: store best hyperparams for similar proteins
+- [ ] Test on sample protein data
+
+### Days 6-7: Pipeline Integration
+- [ ] Update orchestrator:
+  ```python
+  async def run_quantum_chaos(self, study_id: str, quantum_depth: str):
+      quantum_runner = agents["quantum_runner"]
+      ingestion_results = load_ingestion_results(study_id)
+      result = await quantum_runner.execute(ingestion_results)
+      await quantum_runner.learn(ExecutionOutcome(...))
+      return result
+  ```
+- [ ] Wire Stage 2 into `/api/v1/execute`
+- [ ] Add WebSocket updates for convergence progress
+
+### Day 8: Optimization
+- [ ] Profile execution time
+- [ ] Identify bottlenecks
+- [ ] Suggest circuit depth optimization to agent learning system
+
+**Deliverable:** Quantum simulations run, convergence plots generated, chaos metrics extracted
+
+---
+
+## WEEK 4: Biotech Simulator Agent + Data Lab
+
+### Days 1-2: GROMACS Integration
+- [ ] Create `tools/gromacs_runner.py`:
+  ```python
+  class GROMACSRunner:
+      async def setup_md(self, protein_struct, force_field: str):
+          # Prepare GROMACS system
+      async def run_simulation(self, duration_ns: int):
+          # Run MD in Docker
+      def parse_trajectory(self, trajectory_file):
+          # Extract energy, binding affinity, stability
+  ```
+- [ ] Test with sample proteins (low-spec optimization)
+
+### Days 3-4: DataLite Integration
+- [ ] Create `tools/datalife_api.py`:
+  ```python
+  class DataLiteAPI:
+      async def get_reference_data(self, protein_id: str):
+          # Query biotech database
+      async def validate_prediction(self, prediction, reference):
+          # Compare against known data
+      def compute_validation_score(self, simulation_vs_experimental):
+          # Return 0-1 score
+  ```
+
+### Days 5-6: Biotech Simulator Agent
+- [ ] Implement `agents/biotech_sim.py`:
+  ```python
+  async def execute(self, inputs: Dict):
+      # 1. Read quantum results
+      # 2. Setup MD from quantum predictions
+      # 3. Run GROMACS simulation
+      # 4. Validate against experimental data (DataLite)
+      # 5. Extract binding affinity, mutations
+      # 6. Generate hypothesis chain
+      # Return: {binding_affinity, validation_score, hypothesis_chain}
+  ```
+- [ ] Implement learning: store validated protocols
+
+### Day 7-8: Integration & Testing
+- [ ] Wire Stage 3 into orchestrator
+- [ ] Test full quantum → biotech pipeline
+- [ ] Verify 87%+ validation score on known samples
+
+**Deliverable:** Full simulation pipeline, molecular dynamics results, validated predictions
+
+---
+
+## WEEK 5: Metaphor Engine + Book Lab + Writing Agent
+
+### Days 1-2: Comic Metaphor Engine API
+- [ ] Create `tools/metaphor_engine_api.py`:
+  ```python
+  class MetaphorEngine:
+      async def get_metaphor(self, concept: str, domain: str):
+          # Query Comic Metaphor Engine
+          # Return: {metaphor, narrative_arc, characters}
+      async def generate_3d_visualization(self, metaphor):
+          # Generate 3D scene of metaphor
+  ```
+- [ ] Set up API calls to your Comic Metaphor Engine service
+
+### Days 3-4: Book Lab Integration
+- [ ] Create `tools/book_lab_api.py`:
+  ```python
+  class BookLabAPI:
+      async def create_paper(self, sections: Dict, figures: List):
+          # Call Book Lab
+          # Format: title, abstract, methods, results, discussion
+          # Return: PDF bytes
+      async def create_chapter(self, content: str, metaphors: Dict):
+          # Generate book chapter
+          # Return: MD + PDF with illustrations
+  ```
+
+### Days 5-6: Writer Agent
+- [ ] Implement `agents/metaphor_writer.py`:
+  ```python
+  async def execute(self, inputs: Dict):
+      # 1. Read all prior results
+      # 2. Query metaphor engine
+      # 3. Generate narrative structure
+      # 4. Call Book Lab for layout
+      # 5. Embed figures, citations
+      # Return: {paper_main.pdf, paper_supplementary.pdf, chapter.md}
+  ```
+- [ ] Integrate Claude API for writing refinement (optional)
+- [ ] Implement learning: store metaphor patterns that resonate
+
+### Day 7-8: Integration & Quality Check
+- [ ] Wire Stage 4 into orchestrator
+- [ ] Test paper generation (quality 0.85+)
+- [ ] Verify PDF formatting, citations, metaphor integration
+
+**Deliverable:** Publication-ready papers, narrative-infused chapters with illustrations
+
+---
+
+## WEEK 6: Analytics Compiler + Learning Loop
+
+### Days 1-2: Analytics Agent
+- [ ] Implement `agents/analytics_compiler.py`:
+  ```python
+  async def execute(self, inputs: Dict):
+      # 1. Collect all execution metrics
+      # 2. Compute pipeline breakdown
+      # 3. Identify bottlenecks
+      # 4. Generate dashboard.json (Plotly-compatible)
+      # 5. Create performance report
+      # Return: {dashboard.json, report.md, timeline_trace.json}
+  ```
+
+### Days 3-4: Learning System
+- [ ] Implement `agents/learning_loop.py`:
+  ```python
+  async def update_agent_skills(self, execution_log, outcome):
+      # Compute skill deltas based on outcome
+      # If success_rate > threshold: skill +N
+      # Update agent profile in database
+  
+  async def generate_templates(self, successful_executions):
+      # Extract patterns
+      # Store as reusable templates
+  
+  async def suggest_improvements(self, bottleneck_stage):
+      # Analyze failures
+      # Suggest workflow modifications
+  ```
+
+### Days 5-6: Coevolution Feedback
+- [ ] Create `pipelines/coevolution.py`:
+  ```python
+  async def execute_feedback_loop():
+      # 1. Find high-performing agents
+      # 2. Extract discoveries
+      # 3. Generate GitHub issues for software improvements
+      # 4. Suggest new templates
+      # 5. Update agent learning strategies
+  ```
+- [ ] Integrate with GitHub API for auto-issue creation
+
+### Day 7-8: Integration
+- [ ] Wire analytics into Stage 5
+- [ ] Test skill increments (visible on dashboard)
+- [ ] Verify feedback loop triggers
+
+**Deliverable:** Agent skills improve post-execution, software suggestions generated
+
+---
+
+## WEEK 7: React UI + WebSocket + Dashboard
+
+### Days 1-2: React Project Setup
+- [ ] Initialize: `npx create-react-app ui --typescript`
+- [ ] Install dependencies: React Router, Tailwind, Lucide icons, Plotly
+- [ ] Set up API client (axios/fetch)
+
+### Days 3-4: Core UI Components
+- [ ] Implement `FileUploadZone.tsx` (drag-drop file upload)
+- [ ] Implement `PipelineMonitor.tsx` (real-time progress tracking)
+- [ ] Implement `OutputGallery.tsx` (display papers, chapters, files)
+- [ ] Implement `AgentStatus.tsx` (skill levels, memory)
+- [ ] Implement `AnalyticsDashboard.tsx` (Plotly charts)
+
+### Days 5-6: WebSocket Integration
+- [ ] Update `main.py` to implement WebSocket endpoints
+- [ ] Connect UI to `/ws/executions/{execution_id}`
+- [ ] Display real-time stage updates, progress bars
+- [ ] Implement sound notification on completion
+
+### Day 7-8: Polish & Testing
+- [ ] Dark theme styling (slate + cyan)
+- [ ] Responsive design testing
+- [ ] Cross-browser compatibility
+- [ ] Load test with 100+ WebSocket connections
+
+**Deliverable:** Beautiful, functional dashboard with real-time monitoring
+
+---
+
+## WEEK 8: Integration, Testing, Deployment
+
+### Days 1-2: End-to-End Testing
+- [ ] Run complete pipeline: upload → quantum → biotech → writing → analytics
+- [ ] Verify all outputs generated correctly
+- [ ] Check execution time (~6 hours for full pipeline)
+- [ ] Test error recovery (e.g., GROMACS timeout)
+
+### Days 3-4: Performance Optimization
+- [ ] Profile Python code
+- [ ] Optimize database queries
+- [ ] Cache frequently-used computations
+- [ ] Test on low-spec hardware (if applicable)
+
+### Days 5-6: Documentation & Deployment
+- [ ] Write comprehensive README
+- [ ] Create API documentation (Swagger on `/docs`)
+- [ ] Write agent development guide
+- [ ] Create deployment scripts
+
+### Day 7-8: Production Launch
+- [ ] Deploy to Docker: `docker-compose up -d`
+- [ ] Set up monitoring (logs, metrics)
+- [ ] Create backup strategy (database, outputs)
+- [ ] Set up GitHub Actions CI/CD
+
+**Deliverable:** Production-ready system, fully deployed and documented
+
+---
+
+## IMPLEMENTATION CHECKLIST
+
+### Phase 1: MVP (Weeks 1-3)
+- [ ] Week 1: Backend skeleton + API routes
+- [ ] Week 2: Source Ingester agent (PDF/CSV parsing)
+- [ ] Week 3: Quantum Runner agent (GLCCE integration)
+
+**Outcome:** Upload files → ingest → run quantum sims
+
+### Phase 2: Full Pipeline (Weeks 4-6)
+- [ ] Week 4: Biotech Simulator agent (GROMACS + validation)
+- [ ] Week 5: Writer agent (metaphor + papers)
+- [ ] Week 6: Analytics + Learning loop
+
+**Outcome:** Complete 6-hour pipeline producing 2 papers + 1 chapter
+
+### Phase 3: User Experience (Weeks 7-8)
+- [ ] Week 7: React UI + real-time monitoring
+- [ ] Week 8: Testing, optimization, deployment
+
+**Outcome:** Production-ready dashboard for morning ritual
+
+---
+
+## DAILY STANDUP TEMPLATE
+
+Use this to track progress:
+
+```
+Date: YYYY-MM-DD
+Week: [1-8]
+Day: [1-8]
+
+✅ Completed:
+- [ ] Task 1
+- [ ] Task 2
+
+🚧 In Progress:
+- [ ] Task 3
+
+❌ Blocked:
+- [ ] Task 4 (reason: ...)
+
+📊 Metrics:
+- Lines of code: XXXX
+- Test coverage: XX%
+- API endpoints implemented: X/25
+
+🎯 Tomorrow:
+- Task A
+- Task B
+```
+
+---
+
+## DEPLOYMENT CHECKLIST
+
+### Pre-Launch
+- [ ] All tests passing (100% for critical paths)
+- [ ] Database backed up
+- [ ] Environment variables configured
+- [ ] API documentation complete
+- [ ] Error handling comprehensive
+- [ ] Logging enabled on all agents
+
+### Launch Day
+- [ ] Docker containers built & tested
+- [ ] PostgreSQL migrated to production
+- [ ] Redis configured for persistence
+- [ ] GLCCE tools accessible
+- [ ] GROMACS Docker image pulled
+- [ ] UI served from production domain
+
+### Post-Launch Monitoring
+- [ ] Track execution success rate (target: 95%+)
+- [ ] Monitor agent skill progression
+- [ ] Log all failures for learning
+- [ ] Backup results daily
+- [ ] Update agent profiles weekly
+
+---
+
+## SUCCESS METRICS
+
+By end of Week 8, you should have:
+
+| Metric | Target | Status |
+|--------|--------|--------|
+| Files/studies processed | 100+ | |
+| Avg execution time | ~6 hours | |
+| Papers generated | 200+ | |
+| Agent avg skill | 85+ | |
+| API uptime | 99%+ | |
+| Dashboard responsiveness | <200ms | |
+| Error recovery rate | 95%+ | |
+
+---
+
+## NEXT STEPS AFTER WEEK 8
+
+1. **Recursive Improvement (Month 2)**
+   - Implement agent self-improvement (agents suggest tool improvements)
+   - Auto-deploy new features to production
+   - Expand agent capabilities based on discoveries
+
+2. **Multi-Study Parallelization (Month 3)**
+   - Run 3+ studies simultaneously
+   - Nightshift crew integration
+   - Load balancing across compute
+
+3. **Domain Expansion (Month 4)**
+   - Music production workflows (your beat platform)
+   - Logistics optimization
+   - Additional biotech specializations
+
+4. **Monetization (Month 5+)**
+   - SaaS platform for research teams
+   - Agent marketplace
+   - Premium features (3D visualizations, extended reporting)
+
+---
+
+**This is your roadmap. Stick to it, and in 8 weeks you'll have a production agentic research factory.**
