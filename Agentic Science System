@@ -1,0 +1,1060 @@
+# Overlay365 Agentic Science System
+## Complete Architecture & Implementation Guide
+
+**Author:** Overlay365  
+**Date:** 2026-01-23  
+**Status:** Production-Ready Blueprint  
+**Version:** 1.0.0
+
+---
+
+## EXECUTIVE SUMMARY
+
+You are building a **closed-loop agentic research factory** where:
+
+1. **Morning:** Drop sources (books, data, papers, experiments) into unified inbox
+2. **Agent Pipeline:** GLCCE → Digital Lab → Book Lab → Analytics → Timestamped outputs
+3. **Daily Output:** 2-3 science papers, 1 book chapter, analytics dashboards, executable insights
+4. **Coevolution:** Each successful workflow upgrades agent skills; agent discoveries drive software feature requests
+5. **24/7 Operation:** Nightshift crew + science pipeline work continuously; you review/refine outputs
+
+This is a **meta-system**: agents write tools, tools teach agents, agents improve tools.
+
+---
+
+## ARCHITECTURE LAYERS
+
+### Layer 1: Input System (Morning Ritual)
+```
+User Files
+├── PDFs (research papers, books)
+├── CSVs (experimental data, raw observations)
+├── JSONs (configuration, previous results)
+├── Images (scans, diagrams, microscopy)
+└── Markdown (notes, hypotheses, analysis outlines)
+        ↓
+[Source Ingester Agent]
+        ↓
+Normalized Dataset
+├── metadata.json (source, date, domain)
+├── content.md (parsed + extracted)
+├── embeddings.pkl (vector representations)
+└── validation_report.json (quality check)
+```
+
+**Agent Capability:** Vision (extracting tables from PDFs) → Execution (parsing) → Memory (storing lineage)
+
+---
+
+### Layer 2: Quantum Chaos Analysis (GLCCE Integration)
+```
+Normalized Dataset
+        ↓
+[Quantum Chaos Runner Agent]
+├── Detect if VQE/QAOA applicable (protein folding, molecular sim)
+├── Build ansatz (parameterized circuit)
+├── Run on GLCCE (Quantum Chaos simulator)
+├── Measure convergence (CVaR, fidelity, loss)
+└── Extract chaos metrics (Lyapunov exponents, attractor patterns)
+        ↓
+Quantum Results
+├── convergence_plot.png
+├── final_state.pkl
+├── metrics.json ({"CVaR": 0.42, "iterations": 250, "time": "2.3m"})
+├── interpretation.md (agent summary of findings)
+└── next_experiments.json (agent-suggested follow-ups)
+```
+
+**Agent Capability:** Optimization (tuning circuits) → Vision (reading convergence graphs) → Memory (storing best hyperparams)
+
+---
+
+### Layer 3: Biotech Simulation (Digital Lab + DataLite)
+```
+Quantum Results + Domain Data
+        ↓
+[Biotech Simulator Agent]
+├── Match quantum predictions to wet-lab protocols
+├── Run molecular dynamics in Digital Lab (GROMACS via Docker)
+├── Validate against DataLite biotech database
+├── Extract biological insight (binding affinity, mutation impact)
+└── Generate hypothesis chains
+        ↓
+Simulation Results
+├── trajectory.dcd (molecular dynamics output)
+├── energy_landscape.csv (free energy surface)
+├── binding_affinity.json ({"WT": 8.3, "Mutation_A": 7.1, "Mutation_B": 9.2})
+├── hypothesis_chain.md (structured scientific reasoning)
+└── visualization_data.json (for 3D rendering)
+```
+
+**Agent Capability:** Execution (running simulations) → Testing (validation against known data) → Coordination (syncing quantum + biotech results)
+
+---
+
+### Layer 4: Metaphor Engine & Book Lab (Content Synthesis)
+```
+Simulation Results + Insights
+        ↓
+[Metaphor & Writer Agent]
+├── Query Comic Metaphor Engine
+│   ├── "Protein folding" → "Hero's Journey of molecular transformation"
+│   ├── "Quantum tunneling" → "Teleportation between dimensional layers"
+│   └── "Binding affinity" → "Attraction/repulsion dance between characters"
+├── Generate narrative structure (Hero, Challenge, Resolution)
+├── Call Book Lab software
+│   ├── Layout scientific figures + metaphor illustrations
+│   ├── Generate LaTeX sections with citations
+│   └── Embed visualizations with captions
+└── Produce publication-ready outputs
+        ↓
+Content Outputs
+├── paper_main.pdf (6-8 pages, formatted for Nature/Science)
+├── paper_supplementary.pdf (methods, raw data, extended figures)
+├── chapter_draft.md (book section with narrative + rigor)
+├── graphics/
+│   ├── fig1_metaphor.svg (comic-style visualization)
+│   ├── fig2_results.png (scientific data)
+│   └── fig3_landscape.gltf (3D interactive)
+└── metadata.json (citations, authors, DOI-ready)
+```
+
+**Agent Capability:** Coordination (juggling multiple outputs) → Vision (arranging layout) → Memory (learning publication standards)
+
+---
+
+### Layer 5: Analytics & Reporting
+```
+All Prior Outputs
+        ↓
+[Analytics Compiler Agent]
+├── Extract metrics across pipeline
+│   ├── Quantum: iterations, convergence time, final energy
+│   ├── Biotech: simulation duration, energy changes, validation score
+│   ├── Writing: token counts, figure density, citation count
+│   └── Timeline: latency per stage
+├── Generate dashboard data
+│   ├── Convergence curves (quantum + biotech)
+│   ├── Performance heatmap (agent execution times)
+│   ├── Output quality scores (originality, rigor, clarity)
+│   └── Lineage graph (which input → which output)
+└── Create human-readable report
+        ↓
+Analytics Outputs
+├── dashboard.json (Plotly/React-compatible)
+├── performance_report.md (bottlenecks, optimization suggestions)
+├── timeline_trace.json (execution DAG with durations)
+├── quality_scores.csv (metrics for each stage)
+└── next_study_recommendations.json (based on success patterns)
+```
+
+**Agent Capability:** Testing (validating metrics) → Optimization (identifying slowdowns) → Coordination (aggregating results)
+
+---
+
+### Layer 6: Persistent Learning & Evolution
+```
+Daily Execution Data
+        ↓
+[Learning Loop]
+├── Store every execution in SQLite
+│   └── CREATE TABLE executions (
+│       timestamp TEXT,
+│       study_id TEXT,
+│       pipeline_stage TEXT,
+│       agent_id INT,
+│       duration_ms INT,
+│       success BOOL,
+│       skill_delta JSON,
+│       output_quality FLOAT
+│     )
+├── Compute agent skill upgrades
+│   └── "If biotech_sim success_rate > 85%, increase execution skill +2"
+├── Extract reusable workflows
+│   └── "This protein-folding setup worked 9/10 times → save as template"
+├── Generate agent self-improvement tasks
+│   └── "Spend 1 hour learning quantum circuit optimization patterns"
+└── Update agent configs in git
+        ↓
+Enhanced Agent Profiles
+├── Agent skill levels (vision, execution, optimization, etc.)
+├── Learned templates (standard protocols, prompt variations)
+├── Failure modes (known issues + workarounds)
+└── Performance baselines (expected duration, success rate)
+```
+
+**Agent Capability:** Memory (learning from past) → Optimization (becoming faster) → Coordination (teaching other agents)
+
+---
+
+## IMPLEMENTATION STACK
+
+### Core Technologies
+```
+Frontend (UI/UX for Morning Ritual)
+├── React (your agent control dashboard)
+├── Drag-and-drop file upload (Dropzone.js)
+├── Real-time execution monitor (WebSocket → backend)
+└── Plotly.js (interactive analytics dashboards)
+
+Backend (Agent Orchestration)
+├── Python 3.11+ (agent logic)
+├── CrewAI (multi-agent framework) [coordination]
+├── FastAPI (REST API + WebSocket)
+├── PostgreSQL (execution logs, results)
+└── Redis (task queue, agent state)
+
+Scientific Computation
+├── GLCCE (your Quantum Chaos simulator)
+├── GROMACS (molecular dynamics, via Docker)
+├── Digital Lab (biotech simulation suite)
+├── DataLite (low-spec biotech database)
+└── SciPy/NumPy (numerical analysis)
+
+Content Generation
+├── Book Lab software (your layout engine)
+├── Comic Metaphor Engine (custom narrative generator)
+├── Pandoc + LaTeX (PDF generation)
+├── OpenAI API (Claude 3.5 for reasoning, writing polish)
+└── Anthropic Batch API (cost-effective large-scale analysis)
+
+Persistence & CI/CD
+├── SQLite (local execution logs)
+├── Git (version control + CI/CD integration)
+├── Docker (reproducible environments)
+├── Cloudflare Workers (serverless job scheduling)
+└── GitHub Actions (automated publishing)
+```
+
+---
+
+## COMPLETE FILE STRUCTURE
+
+```
+overlay365-science-factory/
+├── README.md (this overview)
+├── docker-compose.yml (full stack: backend, db, redis, glcce, gromacs)
+├── requirements.txt (Python dependencies)
+├── .env.example (API keys, paths)
+│
+├── backend/
+│   ├── main.py (FastAPI app)
+│   ├── config.py (settings, paths, credentials)
+│   ├── database.py (SQLAlchemy models)
+│   └── routes/
+│       ├── upload.py (file ingestion)
+│       ├── execute.py (start pipeline)
+│       ├── status.py (real-time execution status)
+│       └── outputs.py (retrieve results)
+│
+├── agents/
+│   ├── __init__.py
+│   ├── base_agent.py (AgentProfile class with skills, memory)
+│   ├── ingester.py (Source Ingester)
+│   ├── quantum_runner.py (GLCCE integration)
+│   ├── biotech_sim.py (Digital Lab + DataLite)
+│   ├── metaphor_writer.py (Book Lab + Comic Engine)
+│   ├── analytics_compiler.py (metrics aggregation)
+│   └── learning_loop.py (skill upgrades, template generation)
+│
+├── pipelines/
+│   ├── science_pipeline.py (main orchestration)
+│   ├── stages.py (5-layer execution stages)
+│   └── templates/
+│       ├── protein_folding.json (standard setup)
+│       ├── biotech_validation.json
+│       └── custom_workflows.json
+│
+├── tools/
+│   ├── glcce_wrapper.py (subprocess + error handling)
+│   ├── gromacs_runner.py (Docker container management)
+│   ├── book_lab_api.py (calls Book Lab software)
+│   ├── comic_metaphor_api.py (calls Metaphor Engine)
+│   └── pdf_generator.py (LaTeX → PDF)
+│
+├── ui/
+│   ├── App.tsx (React main)
+│   ├── components/
+│   │   ├── FileUpload.tsx (drag-drop zone)
+│   │   ├── PipelineMonitor.tsx (real-time status)
+│   │   ├── OutputGallery.tsx (timestamped deliverables)
+│   │   ├── AgentStatus.tsx (skill levels, memory)
+│   │   └── Analytics.tsx (performance dashboards)
+│   └── styles/ (Tailwind CSS)
+│
+├── data/
+│   ├── inputs/ (user drops files here)
+│   ├── outputs/
+│   │   ├── studies/ (timestamped by study_id)
+│   │   │   ├── protein-folding-v1/
+│   │   │   │   ├── 2026-01-23T06:30:00Z/
+│   │   │   │   │   ├── quantum_results/
+│   │   │   │   │   ├── biotech_sim/
+│   │   │   │   │   ├── papers/
+│   │   │   │   │   ├── chapter/
+│   │   │   │   │   ├── analytics/
+│   │   │   │   │   └── execution_log.json
+│   │   │   │   └── 2026-01-24T06:15:00Z/
+│   │   │   └── biotech-metrics-v1/
+│   │   └── agent_profiles/
+│   │       ├── ingester.json
+│   │       ├── quantum_runner.json
+│   │       └── ...
+│   └── models/ (pre-trained models, embeddings)
+│
+├── docs/
+│   ├── architecture.md
+│   ├── agent_development_guide.md
+│   ├── adding_new_workflows.md
+│   └── api_reference.md
+│
+└── tests/
+    ├── test_agents.py
+    ├── test_pipelines.py
+    └── test_integration.py
+```
+
+---
+
+## CORE AGENT PROFILES
+
+### 1. Source Ingester Agent
+```json
+{
+  "id": "ingester",
+  "name": "Source Ingester",
+  "role": "Parse and normalize input files",
+  "skills": {
+    "vision": 88,
+    "execution": 92,
+    "optimization": 75,
+    "testing": 85,
+    "memory": 90,
+    "coordination": 70
+  },
+  "capabilities": [
+    "PDF text extraction (vision → execution)",
+    "CSV/JSON parsing (execution → memory)",
+    "Image OCR for diagrams (vision)",
+    "Metadata enrichment (coordination)"
+  ],
+  "tools": [
+    "pdfplumber (PDF → text + tables)",
+    "pandas (CSV/JSON parsing)",
+    "EasyOCR (image text extraction)",
+    "spacy (NER for domain entities)"
+  ],
+  "success_metrics": {
+    "parse_success_rate": 0.95,
+    "extraction_accuracy": 0.92,
+    "processing_time_ms": 3000
+  },
+  "learning_trajectory": {
+    "base_skills": "as above",
+    "after_10_runs": "vision +5, memory +3",
+    "after_100_runs": "vision 95, execution 96, memory 95"
+  }
+}
+```
+
+### 2. Quantum Chaos Runner Agent
+```json
+{
+  "id": "quantum_runner",
+  "name": "Quantum Chaos Runner",
+  "role": "Execute GLCCE simulations and extract chaos metrics",
+  "skills": {
+    "vision": 85,
+    "execution": 96,
+    "optimization": 94,
+    "testing": 88,
+    "memory": 87,
+    "coordination": 72
+  },
+  "capabilities": [
+    "VQE circuit design (optimization → memory)",
+    "QAOA parameter tuning (optimization)",
+    "Convergence analysis (vision → testing)",
+    "Lyapunov exponent computation (execution)",
+    "Chaos metric extraction (vision → coordination)"
+  ],
+  "tools": [
+    "GLCCE (simulator)",
+    "Qiskit (circuit construction)",
+    "scikit-optimize (hyperparameter tuning)",
+    "matplotlib (convergence plotting)"
+  ],
+  "success_metrics": {
+    "convergence_rate": 0.88,
+    "circuit_depth_optimized": true,
+    "chaos_metric_extraction": 0.91,
+    "typical_duration_ms": 180000
+  },
+  "learning_trajectory": {
+    "base_skills": "as above",
+    "optimization_focus": "learns faster circuit designs from successful runs",
+    "feedback_loop": "stores best ansätze + hyperparams for similar problems"
+  }
+}
+```
+
+### 3. Biotech Simulator Agent
+```json
+{
+  "id": "biotech_sim",
+  "name": "Biotech Simulator",
+  "role": "Run molecular dynamics and validate quantum predictions",
+  "skills": {
+    "vision": 82,
+    "execution": 95,
+    "optimization": 88,
+    "testing": 92,
+    "memory": 85,
+    "coordination": 89
+  },
+  "capabilities": [
+    "MD setup from quantum results (coordination → execution)",
+    "GROMACS orchestration (execution)",
+    "Trajectory analysis (vision → testing)",
+    "Binding affinity computation (execution → memory)",
+    "Hypothesis chain generation (coordination)"
+  ],
+  "tools": [
+    "GROMACS (molecular dynamics)",
+    "Docker (containerized simulations)",
+    "DataLite (biotech database queries)",
+    "MDTraj (trajectory analysis)"
+  ],
+  "success_metrics": {
+    "validation_score": 0.89,
+    "energy_convergence": 0.91,
+    "simulation_completion_rate": 0.94,
+    "typical_duration_ms": 420000
+  },
+  "learning_trajectory": {
+    "base_skills": "as above",
+    "discovery_feedback": "when binding affinity matches experimental data, stores protocol",
+    "protocol_library": "builds repository of working simulations"
+  }
+}
+```
+
+### 4. Metaphor & Writer Agent
+```json
+{
+  "id": "metaphor_writer",
+  "name": "Metaphor & Writer",
+  "role": "Synthesize findings into narrative form with Comic Metaphor Engine",
+  "skills": {
+    "vision": 90,
+    "execution": 87,
+    "optimization": 79,
+    "testing": 75,
+    "memory": 93,
+    "coordination": 88
+  },
+  "capabilities": [
+    "Comic Metaphor Engine querying (coordination → memory)",
+    "Narrative structure generation (memory → execution)",
+    "Scientific writing (execution)",
+    "Figure layout (vision → execution)",
+    "LaTeX formatting (execution)"
+  ],
+  "tools": [
+    "Comic Metaphor Engine (custom API)",
+    "Book Lab software (layout + PDF generation)",
+    "Claude 3.5 (writing refinement)",
+    "Pandoc (format conversion)"
+  ],
+  "success_metrics": {
+    "paper_clarity_score": 0.87,
+    "metaphor_integration": 0.85,
+    "publication_readiness": 0.88,
+    "typical_duration_ms": 120000
+  },
+  "learning_trajectory": {
+    "base_skills": "as above",
+    "narrative_patterns": "learns which metaphor types resonate for different domains",
+    "feedback_loop": "if papers get cited/published, stores metaphor + structure"
+  }
+}
+```
+
+### 5. Analytics Compiler Agent
+```json
+{
+  "id": "analytics_compiler",
+  "name": "Analytics Compiler",
+  "role": "Aggregate metrics and generate performance insights",
+  "skills": {
+    "vision": 88,
+    "execution": 89,
+    "optimization": 91,
+    "testing": 94,
+    "memory": 86,
+    "coordination": 92
+  },
+  "capabilities": [
+    "Metric extraction across stages (execution → testing)",
+    "Dashboard generation (vision → execution)",
+    "Bottleneck identification (testing → optimization)",
+    "Performance trend analysis (memory → vision)",
+    "Recommendation synthesis (coordination)"
+  ],
+  "tools": [
+    "pandas (data aggregation)",
+    "Plotly (interactive dashboards)",
+    "scikit-learn (anomaly detection)",
+    "SQLAlchemy (database queries)"
+  ],
+  "success_metrics": {
+    "metric_accuracy": 0.97,
+    "dashboard_generation": 0.99,
+    "bottleneck_detection_precision": 0.89,
+    "typical_duration_ms": 8000
+  },
+  "learning_trajectory": {
+    "base_skills": "as above",
+    "correlation_learning": "detects which workflow changes improve metrics",
+    "feedback_loop": "recommends workflow tuning based on historical data"
+  }
+}
+```
+
+---
+
+## EXECUTION FLOW (Morning Ritual → Deliverables)
+
+### Step 0: You (Morning Setup)
+```
+6:00 AM: Wake up
+6:05 AM: Browse your research interest (protein folding, new biotech insight, etc.)
+6:10 AM: Gather sources:
+  - Download paper on novel protein interaction
+  - Export experimental CSV from lab database
+  - Screenshot breakthrough insight from news
+  - Save relevant book chapter as PDF
+6:15 AM: Drag 4 files into upload zone
+6:16 AM: Click "Start Science Pipeline: Protein Folding Study v1"
+```
+
+### Step 1: Source Ingestion (6:16 AM - 6:20 AM)
+```
+[Source Ingester Agent activates]
+├── Detects file types (PDF, CSV, PNG, MD)
+├── Runs vision model on PDFs → extracts tables, figures, text
+├── Parses CSV → identifies columns, data distributions
+├── OCRs images → enriches with descriptions
+├── Enriches metadata (source, date, domain tags)
+├── Produces: metadata.json, content.md, embeddings.pkl
+│
+Dashboard update: "✓ Ingestion complete (4 files, 18.3 KB)"
+Execution time: 4m 15s
+Memory boost: vision +1
+```
+
+### Step 2: Quantum Chaos Analysis (6:20 AM - 8:10 AM)
+```
+[Quantum Chaos Runner Agent activates]
+├── Reads content.md → identifies if protein-folding task
+├── Detects "VQE applicable: target protein, 156 amino acids"
+├── Designs ansatz (Hardware-Efficient Ansatz, depth=5)
+├── Tunes hyperparameters (learning rate, iterations, CVaR threshold)
+├── Submits 250-iteration VQE job to GLCCE
+├── Monitors convergence (real-time plots in dashboard)
+├── Extracts metrics:
+│   ├── final_energy: -156.42 Ha
+│   ├── iterations_to_convergence: 187
+│   ├── convergence_time: 110m 45s
+│   ├── lyapunov_exponent: 0.35 (weak chaos detected)
+│   └── optimal_circuit: ansatz_seed_42_depth_5.qasm
+│
+Dashboard update: "✓ Quantum sim complete (187 iterations, CVaR: 0.42)"
+Execution time: 110m 45s
+Memory boost: optimization +2, execution +1
+```
+
+### Step 3: Biotech Simulation (8:10 AM - 10:35 AM)
+```
+[Biotech Simulator Agent activates]
+├── Reads quantum results → extracts optimal circuit state
+├── Initializes protein structure from PDB database (1PRX)
+├── Applies quantum predictions as constraints/guides
+├── Sets up GROMACS (force field: AMBER14SB, solvent: TIP3P)
+├── Runs 50-ns molecular dynamics in Docker container
+├── Monitors energy convergence, temperature stability
+├── Extracts metrics:
+│   ├── binding_affinity_WT: 8.3 kcal/mol
+│   ├── stability_score: 0.87 (validated vs. experimental)
+│   ├── mutation_predictions: [
+│   │   {"mutation": "A42G", "affinity": 7.1},
+│   │   {"mutation": "T56S", "affinity": 9.2}
+│   │ ]
+│   └── hypothesis: "T56S stabilizes binding pocket"
+│
+Dashboard update: "✓ Biotech sim complete (50 ns, validation: 87%)"
+Execution time: 145m 10s
+Memory boost: execution +2, testing +1
+```
+
+### Step 4: Metaphor & Writing (10:35 AM - 11:50 AM)
+```
+[Metaphor & Writer Agent activates]
+├── Reads all prior results (quantum, biotech, validation)
+├── Queries Comic Metaphor Engine:
+│   ├── Input: {"concept": "protein folding", "domain": "quantum-biotech"}
+│   ├── Output: {
+│   │   "metaphor": "Hero's Journey of Molecular Transformation",
+│   │   "narrative_arc": ["Call to Adventure (disorder)", "Trials (folding)", "Transformation (stability)"],
+│   │   "characters": [
+│   │     {"role": "Hero", "entity": "nascent polypeptide"},
+│   │     {"role": "Guide", "entity": "quantum tunneling"}
+│   │   ]
+│   │ }
+├── Structures paper:
+│   ├── Abstract (with metaphor hook)
+│   ├── Introduction (context + narrative setup)
+│   ├── Quantum Methods (Hero's Call: why quantum?)
+│   ├── Results (Trials & Tests)
+│   ├── Discussion (Transformation achieved)
+│   └── Conclusion (New wisdom)
+├── Calls Book Lab software:
+│   ├── Inserts figures (quantum convergence, MD trajectory)
+│   ├── Embeds metaphor illustrations (comic-style hero journey)
+│   ├── Formats LaTeX citations
+│   └── Generates PDF
+├── Generates outputs:
+│   ├── paper_main.pdf (8 pages, Nature-formatted)
+│   ├── paper_supplementary.pdf (5 pages, methods + raw data)
+│   └── chapter_draft.md (book section, 3,500 words)
+│
+Dashboard update: "✓ Papers & writing complete (2 PDFs, 1 chapter)"
+Execution time: 75m 15s
+Memory boost: coordination +2, vision +1
+```
+
+### Step 5: Analytics & Reporting (11:50 AM - 11:55 AM)
+```
+[Analytics Compiler Agent activates]
+├── Aggregates all execution data
+├── Computes:
+│   ├── Total pipeline time: 336m 15s
+│   ├── Stage breakdown:
+│   │   ├── Ingestion: 4m 15s (1.3%)
+│   │   ├── Quantum: 110m 45s (32.9%)
+│   │   ├── Biotech: 145m 10s (43.2%)
+│   │   ├── Writing: 75m 15s (22.4%)
+│   │   └── Analytics: 5m (1.5%)
+│   ├── Output quality scores:
+│   │   ├── paper_clarity: 0.89
+│   │   ├── metaphor_integration: 0.86
+│   │   ├── scientific_rigor: 0.91
+│   │   └── publication_readiness: 0.88
+│   └── Agent skill deltas (post-execution):
+│       ├── ingester: vision +1, execution +1
+│       ├── quantum_runner: optimization +2, execution +1
+│       ├── biotech_sim: execution +2, testing +1
+│       ├── metaphor_writer: coordination +2, vision +1
+│       └── analytics_compiler: (no skill change, still learning)
+├── Generates dashboard.json (Plotly charts, 12 visualizations)
+├── Recommends next steps:
+│   ├── "Quantum sims are bottleneck (43% of time)"
+│   ├── "Suggestion: try shallower ansatz (depth 3) for faster convergence"
+│   ├── "Your mutation predictions align with literature (92% match)"
+│   └── "Book metaphor resonated well (avg clarity: 0.89)"
+│
+Dashboard update: "✓ Analysis complete"
+Execution time: 5m 15s
+```
+
+### Step 6: Timestamped Delivery (11:56 AM)
+```
+outputs/studies/protein-folding-v1/2026-01-23T11:56:00Z/
+├── quantum_results/
+│   ├── convergence_plot.png
+│   ├── final_state.pkl
+│   ├── metrics.json
+│   └── interpretation.md
+├── biotech_sim/
+│   ├── trajectory.dcd
+│   ├── energy_landscape.csv
+│   ├── binding_affinity.json
+│   ├── validation_report.json
+│   └── hypothesis_chain.md
+├── papers/
+│   ├── paper_main.pdf (publication-ready)
+│   ├── paper_supplementary.pdf
+│   └── metadata.json (DOI-ready)
+├── chapter/
+│   ├── chapter_draft.md
+│   ├── chapter_final.pdf
+│   └── graphics/ (12 metaphor illustrations)
+├── analytics/
+│   ├── dashboard.json
+│   ├── performance_report.md
+│   ├── timeline_trace.json
+│   └── quality_scores.csv
+└── execution_log.json
+    {
+      "timestamp": "2026-01-23T06:16:00Z",
+      "study_id": "protein-folding-v1",
+      "total_duration_ms": 20175000,
+      "stages": [...],
+      "agent_skill_deltas": {...},
+      "quality_score": 0.88,
+      "success": true,
+      "next_recommended_study": "T56S_mutation_validation"
+    }
+
+Git commit: protein-folding-v1 results [2026-01-23T11:56Z]
+GitHub release: Add protein-folding-v1 study + papers to Digital Uplift Lab
+```
+
+### Step 7: Your Review (Noon)
+```
+You check dashboard:
+- 2 papers (main + supplementary)
+- 1 book chapter (5 pages of metaphor-infused narrative)
+- Convergence plots, energy landscapes, binding predictions
+- Agent performance: all skills increased 1-2 points
+- Execution time: 336 minutes (manageable, no major bottlenecks)
+- Quality score: 0.88/1.0
+
+Approval: "Great! Ship the main paper. Flag chapter for Digital Uplift Lab."
+
+System action: Auto-submit paper to arXiv, add chapter to book-in-progress.json
+```
+
+---
+
+## COEVOLUTION: SOFTWARE ↔ AGENTS FEEDBACK LOOP
+
+### Example 1: Agent Discovery → Software Feature
+```
+Execution #47: Quantum Chaos Runner discovers that
+"shallow circuits (depth 3) converge 2x faster than depth 5,
+with only 5% accuracy loss for proteins < 200 amino acids"
+
+Learning system triggers:
+├── Stores insight in agent_learnings.json
+├── Generates GitHub issue: "Feature request: Auto-select circuit depth
+   based on protein size"
+├── Your Nightshift reads issue, proposes implementation
+├── Cheetah v3 codes depth-selection algorithm
+├── New quantum_runner.py includes smart ansatz selection
+├── Your approval → merged into main
+├── All future runs use optimized depth → 2x speedup
+
+Agent reward: skill optimization +3 (discovery bonus)
+```
+
+### Example 2: Software Enhancement → Agent Capability
+```
+You add Comic Metaphor Engine v2:
+├── New capability: generates 3D visualizations of metaphors
+│   (Hero journey → 3D landscape animation)
+├── Metaphor & Writer Agent detects new tool
+├── Capability: "3D visualization generation" unlocked
+├── Tests on next paper → generates stunning 3D anime-style hero journey
+├── Output quality jumps: 0.86 → 0.92
+├── Agent memory: "3D visuals increase clarity +6%"
+├── Future papers auto-use 3D metaphors where applicable
+
+Agent reward: vision +2, coordination +2
+```
+
+### Example 3: Failure → Improvement Loop
+```
+Execution #12: Biotech Simulator fails
+├── GROMACS crashes: "Temperature exceeds 400K"
+├── Failure logged with context: protein, force field, initial conditions
+├── Learning system: "This protein needs 10-ns equilibration first"
+├── New rule generated: IF protein_mass > 50kDa THEN equilibrate 10ns
+├── Stored in templates/biotech_validation.json
+├── Execution #13 succeeds (with equilibration step)
+├── Agent memory: success_rate +4%
+
+Agent reward: testing +2, memory +3
+```
+
+---
+
+## SCALING & DAILY OPERATIONS
+
+### Day 1-7: Baseline
+- 1 study/day (protein folding variant)
+- ~6 hours pipeline time
+- 2 papers, 1 chapter, analytics per day
+- Agents calibrate skills, learn workflows
+
+### Week 2-4: Multi-Study Parallel
+- 3 studies/day (Nightshift runs 2+ overnight, you drive 1 AM)
+- Parallel execution: while quantum sim runs, ingester starts next study
+- 6 papers/week, 7 chapters/week, comprehensive dashboards
+- Agent specialization deepens
+
+### Month 2+: Recursive Enhancement
+- Agent network effects: metaphor writer learns from quantum runner's metaphors
+- Software improvements compound: each feature cascades to all agents
+- Output quality stabilizes at 0.90+ for publication
+- Your role: strategic direction only (which studies matter?)
+
+---
+
+## KEY METRICS TO TRACK
+
+### Agent Performance
+```json
+{
+  "agent_metrics": {
+    "ingester": {"skill_avg": 86.4, "success_rate": 0.97, "processing_time_ms": 3200},
+    "quantum_runner": {"skill_avg": 89.5, "success_rate": 0.88, "convergence_time_ms": 180000},
+    "biotech_sim": {"skill_avg": 88.5, "success_rate": 0.94, "validation_score": 0.89},
+    "metaphor_writer": {"skill_avg": 87.4, "success_rate": 0.96, "clarity_score": 0.88},
+    "analytics_compiler": {"skill_avg": 89.8, "success_rate": 0.99, "insight_accuracy": 0.92}
+  }
+}
+```
+
+### Pipeline Performance
+```json
+{
+  "pipeline_metrics": {
+    "total_studies_completed": 23,
+    "avg_total_time_ms": 20175000,
+    "avg_quality_score": 0.87,
+    "bottleneck_stage": "quantum_sim (43% of time)",
+    "papers_generated": 46,
+    "chapters_generated": 23,
+    "avg_citation_potential": 0.85
+  }
+}
+```
+
+### Coevolution Metrics
+```json
+{
+  "coevolution_metrics": {
+    "agent_skill_improvements": {
+      "total_skill_points_earned": 127,
+      "avg_improvement_per_day": 5.4,
+      "skill_with_highest_improvement": "optimization (+18 total)",
+      "agent_with_fastest_growth": "quantum_runner"
+    },
+    "software_enhancements": {
+      "features_suggested_by_agents": 8,
+      "features_implemented": 6,
+      "avg_latency_improvement": "23%",
+      "quality_score_improvement": "from 0.82 → 0.87"
+    }
+  }
+}
+```
+
+---
+
+## IMPLEMENTATION PHASES
+
+### Phase 1: MVP (Weeks 1-2)
+- [x] File upload + Source Ingester agent
+- [x] GLCCE integration + Quantum Runner agent
+- [x] Basic biotech sim + Biotech Sim agent
+- [x] Simple writing (no metaphor engine yet) + Writer agent
+- [x] Analytics compilation
+- [ ] Coevolution feedback loop
+
+**Output:** 1 paper/day, basic metrics
+
+### Phase 2: Metaphor Integration (Weeks 3-4)
+- [x] Comic Metaphor Engine API integration
+- [x] Book Lab software integration
+- [x] Enhanced narrative generation
+- [x] Metaphor quality scoring
+- [ ] 3D visualization generation
+
+**Output:** 2 papers + 1 chapter/day, narrative quality 0.85+
+
+### Phase 3: Coevolution (Weeks 5-6)
+- [x] Agent learning system (skill upgrades, template storage)
+- [x] Software feature requests from agent discoveries
+- [x] Automated testing of new features
+- [x] GitHub integration (CI/CD for tool improvements)
+- [ ] Recursive agent self-improvement (agents suggest improvements to themselves)
+
+**Output:** Auto-improving system, 3 studies/day parallel, quality 0.90+
+
+### Phase 4: Scale & Productization (Weeks 7-8)
+- [x] Multi-user support (multiple study types)
+- [x] Cloudflare Workers for scheduled execution
+- [x] Dashboard public sharing (publish papers automatically)
+- [x] Agent team marketplace (custom agents for specific domains)
+- [ ] Licensing + monetization (SaaS for research teams)
+
+**Output:** Production-ready, scalable to 10+ studies/day
+
+---
+
+## NEXT IMMEDIATE STEPS
+
+1. **Set up backend skeleton** (FastAPI + PostgreSQL + Redis)
+2. **Implement Source Ingester** (test with 5 sample PDFs)
+3. **Integrate GLCCE wrapper** (subprocess calls + error handling)
+4. **Build React UI** (file upload + real-time monitor)
+5. **Create Quantum Runner agent** (run first simulation end-to-end)
+6. **Iterate through remaining agents** (one per week)
+7. **Test full pipeline** (drop files → get papers in 6 hours)
+8. **Deploy** (Docker + Cloudflare Workers)
+
+---
+
+## APPENDIX A: AGENT DEVELOPMENT GUIDE
+
+To add a new agent (e.g., "Statistical Analyzer" for biostat insights):
+
+```python
+# agents/statistical_analyzer.py
+from base_agent import BaseAgent
+
+class StatisticalAnalyzer(BaseAgent):
+    def __init__(self):
+        super().__init__(
+            id="stats_analyzer",
+            name="Statistical Analyzer",
+            role="Extract statistical significance from simulation results"
+        )
+        self.skills = {
+            "vision": 85,
+            "execution": 87,
+            "optimization": 80,
+            "testing": 93,  # High testing for rigor
+            "memory": 82,
+            "coordination": 75
+        }
+    
+    async def execute(self, inputs: Dict):
+        """
+        Args:
+            inputs: {
+              "biotech_sim_results": binding_affinity_json,
+              "experimental_data": reference_csv
+            }
+        Returns:
+            outputs: {
+              "p_values": [...],
+              "confidence_intervals": [...],
+              "conclusions": "..."
+            }
+        """
+        # Your implementation here
+        pass
+    
+    async def learn(self, outcome: ExecutionOutcome):
+        """Update skills based on success"""
+        if outcome.success:
+            self.skills["testing"] += 1  # Rigorous analysis works
+            self.skills["execution"] += 0.5
+
+# Register in agents/__init__.py
+AGENTS = {
+    "statistical_analyzer": StatisticalAnalyzer()
+}
+```
+
+Add to pipeline in `pipelines/science_pipeline.py`:
+```python
+async def execute_pipeline(study_id: str):
+    # ... quantum, biotech ...
+    stats_results = await agents["statistical_analyzer"].execute(
+        biotech_sim_results
+    )
+    # ... writing, analytics ...
+```
+
+---
+
+## APPENDIX B: API REFERENCE
+
+### Start Science Pipeline
+```
+POST /api/v1/execute
+{
+  "study_id": "protein-folding-v1",
+  "study_type": "quantum_biotech",
+  "input_files": ["protein.pdb", "experimental_data.csv"],
+  "config": {
+    "quantum_depth": "auto",
+    "md_duration_ns": 50,
+    "use_metaphor_engine": true
+  }
+}
+
+Response:
+{
+  "execution_id": "exec_abc123",
+  "status": "queued",
+  "estimated_duration_ms": 20175000
+}
+```
+
+### Real-time Execution Status
+```
+WebSocket: ws://localhost:8000/ws/executions/exec_abc123
+
+Messages:
+{
+  "timestamp": "2026-01-23T06:20:00Z",
+  "stage": "quantum_sim",
+  "progress_percent": 35,
+  "message": "Quantum convergence: iteration 87/250, energy: -156.38 Ha",
+  "agent_skill_delta": {"quantum_runner": {"optimization": +1}}
+}
+```
+
+### Retrieve Results
+```
+GET /api/v1/results/exec_abc123
+
+Response:
+{
+  "execution_id": "exec_abc123",
+  "timestamp": "2026-01-23T11:56:00Z",
+  "outputs": {
+    "papers": ["/outputs/.../ paper_main.pdf", "...supplementary.pdf"],
+    "chapter": "/outputs/.../chapter_draft.md",
+    "analytics": "/outputs/.../dashboard.json",
+    "metrics": {...}
+  }
+}
+```
+
+---
+
+## SUCCESS CRITERIA
+
+✅ Phase 1 Complete When:
+- You drop 3 files at 6 AM
+- System produces 1 paper + 1 chapter by noon
+- All agents execute successfully
+- Execution log stored in SQLite
+
+✅ Phase 2 Complete When:
+- 1-2 papers have metaphor elements
+- Chapter reads like a narrative, not a lab report
+- Quality score ≥ 0.85
+- Book Lab PDF generation works end-to-end
+
+✅ Phase 3 Complete When:
+- Agent skills increase from executions (visible in dashboard)
+- Software improvements driven by agent discoveries
+- 3+ studies run in parallel overnight
+- Quality score ≥ 0.90
+
+✅ Full Production When:
+- 5+ studies/day with minimal oversight
+- Papers publishable to arXiv automatically
+- Agent network self-improves (discovers → implements → improves)
+- System handles new domains (biotech, music, logistics) with minimal reconfig
+
+---
+
+**End of Architecture Document**
