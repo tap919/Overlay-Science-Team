@@ -1,0 +1,408 @@
+#!/usr/bin/env python3
+"""
+Tool Integration Adapters
+Wrapper classes to control your existing software via UI automation
+"""
+
+import pyautogui
+import time
+import subprocess
+from pathlib import Path
+from typing import Dict, Any, Optional, List
+import cv2
+import numpy as np
+from PIL import Image
+import pytesseract
+
+class BaseToolAdapter:
+    """Base class for tool adapters with vision-based UI control"""
+    
+    def __init__(self, app_name: str, executable_path: str):
+        self.app_name = app_name
+        self.executable_path = executable_path
+        self.window_title = None
+        self.is_running = False
+        
+        # UI element detection confidence
+        self.confidence = 0.8
+        
+    def launch(self, wait_seconds: int = 5) -> bool:
+        """Launch the application"""
+        try:
+            subprocess.Popen([self.executable_path])
+            time.sleep(wait_seconds)
+            self.is_running = True
+            return True
+        except Exception as e:
+            print(f"Error launching {self.app_name}: {e}")
+            return False
+    
+    def find_button(self, button_image: str) -> Optional[tuple]:
+        """Find button on screen using template matching"""
+        try:
+            location = pyautogui.locateOnScreen(button_image, confidence=self.confidence)
+            if location:
+                return pyautogui.center(location)
+        except Exception as e:
+            print(f"Could not find button: {e}")
+        return None
+    
+    def click_button(self, button_image: str, offset: tuple = (0, 0)) -> bool:
+        """Click a button found by image"""
+        pos = self.find_button(button_image)
+        if pos:
+            pyautogui.click(pos[0] + offset[0], pos[1] + offset[1])
+            return True
+        return False
+    
+    def read_text_region(self, region: tuple) -> str:
+        """OCR text from screen region (x, y, width, height)"""
+        screenshot = pyautogui.screenshot(region=region)
+        return pytesseract.image_to_string(screenshot)
+    
+    def type_text(self, text: str, interval: float = 0.05):
+        """Type text with human-like timing"""
+        pyautogui.write(text, interval=interval)
+    
+    def wait_for_element(self, element_image: str, timeout: int = 30) -> bool:
+        """Wait for UI element to appear"""
+        start = time.time()
+        while time.time() - start < timeout:
+            if self.find_button(element_image):
+                return True
+            time.sleep(0.5)
+        return False
+
+
+class GLCCEAdapter(BaseToolAdapter):
+    """Adapter for GLCCE Quantum Chaos software"""
+    
+    def __init__(self, executable_path: str):
+        super().__init__("GLCCE", executable_path)
+        self.assets_dir = Path("./ui_assets/glcce")
+        
+    def run_chaos_simulation(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute a quantum chaos simulation"""
+        
+        if not self.is_running:
+            self.launch()
+        
+        # Step 1: Open new simulation
+        self.click_button(str(self.assets_dir / "new_simulation.png"))
+        time.sleep(1)
+        
+        # Step 2: Set chaos coefficient
+        self.click_button(str(self.assets_dir / "chaos_param_field.png"))
+        pyautogui.hotkey('ctrl', 'a')
+        self.type_text(str(params['chaos_coefficient']))
+        
+        # Step 3: Set iterations
+        self.click_button(str(self.assets_dir / "iterations_field.png"))
+        pyautogui.hotkey('ctrl', 'a')
+        self.type_text(str(params['iterations']))
+        
+        # Step 4: Set particle count
+        self.click_button(str(self.assets_dir / "particles_field.png"))
+        pyautogui.hotkey('ctrl', 'a')
+        self.type_text(str(params['particle_count']))
+        
+        # Step 5: Start simulation
+        self.click_button(str(self.assets_dir / "run_button.png"))
+        
+        # Step 6: Wait for completion
+        if self.wait_for_element(str(self.assets_dir / "simulation_complete.png"), timeout=300):
+            # Extract results from UI
+            results = self._extract_results()
+            
+            # Export data
+            self._export_results(params.get('export_path', './results'))
+            
+            return results
+        else:
+            raise TimeoutError("Simulation did not complete in time")
+    
+    def _extract_results(self) -> Dict[str, Any]:
+        """Extract simulation results from UI"""
+        # Define regions for key metrics (x, y, width, height)
+        convergence_region = (800, 150, 150, 30)
+        chaos_metric_region = (800, 200, 150, 30)
+        energy_region = (800, 250, 150, 30)
+        
+        results = {
+            "convergence_rate": float(self.read_text_region(convergence_region).strip()),
+            "chaos_metric": float(self.read_text_region(chaos_metric_region).strip()),
+            "folding_energy": float(self.read_text_region(energy_region).strip())
+        }
+        
+        return results
+    
+    def _export_results(self, export_path: str):
+        """Export simulation results"""
+        # Click export button
+        self.click_button(str(self.assets_dir / "export_button.png"))
+        time.sleep(1)
+        
+        # Type export path
+        self.type_text(export_path)
+        pyautogui.press('enter')
+        time.sleep(2)
+
+
+class DigitalLabAdapter(BaseToolAdapter):
+    """Adapter for Digital Lab biotech simulation software"""
+    
+    def __init__(self, executable_path: str):
+        super().__init__("Digital Lab", executable_path)
+        self.assets_dir = Path("./ui_assets/digital_lab")
+    
+    def run_biotech_experiment(self, protocol: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute biotech simulation experiment"""
+        
+        if not self.is_running:
+            self.launch()
+        
+        # Step 1: Create new experiment
+        self.click_button(str(self.assets_dir / "new_experiment.png"))
+        time.sleep(1)
+        
+        # Step 2: Select experiment type
+        experiment_type = protocol.get('type', 'binding_study')
+        self.click_button(str(self.assets_dir / f"type_{experiment_type}.png"))
+        
+        # Step 3: Configure parameters
+        for param, value in protocol.get('parameters', {}).items():
+            field_image = str(self.assets_dir / f"field_{param}.png")
+            if self.click_button(field_image):
+                pyautogui.hotkey('ctrl', 'a')
+                self.type_text(str(value))
+        
+        # Step 4: Load molecular data (if provided)
+        if 'molecule_file' in protocol:
+            self.click_button(str(self.assets_dir / "load_molecule.png"))
+            time.sleep(1)
+            self.type_text(protocol['molecule_file'])
+            pyautogui.press('enter')
+            time.sleep(2)
+        
+        # Step 5: Run simulation
+        self.click_button(str(self.assets_dir / "simulate_button.png"))
+        
+        # Step 6: Monitor progress and wait for completion
+        if self.wait_for_element(str(self.assets_dir / "simulation_done.png"), timeout=600):
+            results = self._extract_biotech_results()
+            return results
+        else:
+            raise TimeoutError("Biotech simulation timeout")
+    
+    def _extract_biotech_results(self) -> Dict[str, Any]:
+        """Extract results from Digital Lab UI"""
+        results = {
+            "binding_affinity": self._read_metric("binding_affinity"),
+            "toxicity_score": self._read_metric("toxicity"),
+            "pathway_activation": self._read_pathways()
+        }
+        return results
+    
+    def _read_metric(self, metric_name: str) -> float:
+        """Read specific metric from results panel"""
+        # Position depends on your UI layout
+        metric_regions = {
+            "binding_affinity": (700, 300, 100, 25),
+            "toxicity": (700, 350, 100, 25)
+        }
+        
+        if metric_name in metric_regions:
+            text = self.read_text_region(metric_regions[metric_name])
+            # Parse numeric value from text
+            import re
+            match = re.search(r'\d+\.?\d*', text)
+            return float(match.group()) if match else 0.0
+        return 0.0
+    
+    def _read_pathways(self) -> List[str]:
+        """Identify activated pathways from results"""
+        # This would use image recognition or OCR on pathway diagram
+        # Simplified version:
+        pathways_region = (600, 400, 300, 200)
+        text = self.read_text_region(pathways_region)
+        
+        # Extract pathway names
+        known_pathways = ["MAPK", "PI3K", "mTOR", "JAK-STAT", "Wnt"]
+        activated = [p for p in known_pathways if p in text]
+        return activated
+
+
+class BookLabAdapter(BaseToolAdapter):
+    """Adapter for Book Lab paper/book writing software"""
+    
+    def __init__(self, executable_path: str):
+        super().__init__("Book Lab", executable_path)
+        self.assets_dir = Path("./ui_assets/book_lab")
+    
+    def generate_paper(self, content: str, template: str = "research_paper") -> str:
+        """Generate formatted paper from content"""
+        
+        if not self.is_running:
+            self.launch()
+        
+        # Step 1: New document from template
+        self.click_button(str(self.assets_dir / "new_document.png"))
+        time.sleep(1)
+        
+        # Select template
+        template_button = str(self.assets_dir / f"template_{template}.png")
+        self.click_button(template_button)
+        time.sleep(2)
+        
+        # Step 2: Paste content
+        # Click in content area
+        self.click_button(str(self.assets_dir / "content_area.png"))
+        
+        # Paste (split into chunks if too long)
+        chunk_size = 1000
+        for i in range(0, len(content), chunk_size):
+            chunk = content[i:i+chunk_size]
+            pyautogui.write(chunk, interval=0.01)
+            time.sleep(0.5)
+        
+        # Step 3: Auto-format
+        self.click_button(str(self.assets_dir / "auto_format.png"))
+        time.sleep(3)
+        
+        # Step 4: Export
+        output_path = f"./outputs/paper_{int(time.time())}.pdf"
+        self.click_button(str(self.assets_dir / "export_pdf.png"))
+        time.sleep(1)
+        self.type_text(output_path)
+        pyautogui.press('enter')
+        time.sleep(3)
+        
+        return output_path
+
+
+class ComicEngineAdapter(BaseToolAdapter):
+    """Adapter for Comic Book Metaphor Engine"""
+    
+    def __init__(self, executable_path: str):
+        super().__init__("Comic Engine", executable_path)
+        self.assets_dir = Path("./ui_assets/comic_engine")
+    
+    def generate_metaphors(self, concepts: List[str], style: str = "scientific") -> List[Dict]:
+        """Generate visual metaphors for concepts"""
+        
+        if not self.is_running:
+            self.launch()
+        
+        metaphors = []
+        
+        for concept in concepts:
+            # Step 1: New metaphor
+            self.click_button(str(self.assets_dir / "new_metaphor.png"))
+            time.sleep(1)
+            
+            # Step 2: Enter concept
+            self.click_button(str(self.assets_dir / "concept_field.png"))
+            self.type_text(concept)
+            
+            # Step 3: Select style
+            self.click_button(str(self.assets_dir / f"style_{style}.png"))
+            
+            # Step 4: Generate
+            self.click_button(str(self.assets_dir / "generate_button.png"))
+            
+            # Wait for generation
+            if self.wait_for_element(str(self.assets_dir / "metaphor_ready.png"), timeout=60):
+                # Extract metaphor description
+                description_region = (400, 300, 400, 200)
+                description = self.read_text_region(description_region)
+                
+                # Save visualization
+                self.click_button(str(self.assets_dir / "save_image.png"))
+                image_path = f"./outputs/metaphor_{len(metaphors)}.png"
+                self.type_text(image_path)
+                pyautogui.press('enter')
+                time.sleep(2)
+                
+                metaphors.append({
+                    "concept": concept,
+                    "description": description,
+                    "image_path": image_path
+                })
+        
+        return metaphors
+
+
+# Example usage and integration
+class ToolOrchestrator:
+    """Orchestrates all tool adapters"""
+    
+    def __init__(self, config: Dict[str, str]):
+        self.glcce = GLCCEAdapter(config.get('glcce_path', './glcce/app'))
+        self.digital_lab = DigitalLabAdapter(config.get('digital_lab_path', './digital_lab/app'))
+        self.book_lab = BookLabAdapter(config.get('book_lab_path', './book_lab/app'))
+        self.comic_engine = ComicEngineAdapter(config.get('comic_engine_path', './comic_engine/app'))
+    
+    def run_full_pipeline(self, study_params: Dict) -> Dict:
+        """Execute full scientific pipeline across all tools"""
+        
+        results = {}
+        
+        # 1. Quantum simulation
+        print("Running quantum chaos simulation...")
+        results['quantum'] = self.glcce.run_chaos_simulation(study_params['quantum_params'])
+        
+        # 2. Biotech experiments
+        print("Running biotech simulations...")
+        results['biotech'] = self.digital_lab.run_biotech_experiment(study_params['biotech_protocol'])
+        
+        # 3. Generate papers (would integrate with AI agent for content)
+        print("Generating research papers...")
+        # Content would come from AI agent synthesis
+        paper_content = study_params.get('paper_content', '')
+        results['paper_path'] = self.book_lab.generate_paper(paper_content)
+        
+        # 4. Generate metaphors
+        print("Creating visual metaphors...")
+        concepts = study_params.get('concepts', [])
+        results['metaphors'] = self.comic_engine.generate_metaphors(concepts)
+        
+        return results
+
+
+if __name__ == "__main__":
+    # Test individual adapters
+    config = {
+        'glcce_path': './glcce/glcce.exe',
+        'digital_lab_path': './digital_lab/digital_lab.exe',
+        'book_lab_path': './book_lab/book_lab.exe',
+        'comic_engine_path': './comic_engine/comic_engine.exe'
+    }
+    
+    orchestrator = ToolOrchestrator(config)
+    
+    # Example study
+    study_params = {
+        'quantum_params': {
+            'chaos_coefficient': 0.7,
+            'iterations': 1000,
+            'particle_count': 500,
+            'export_path': './study_001/quantum_results'
+        },
+        'biotech_protocol': {
+            'type': 'binding_study',
+            'parameters': {
+                'temperature': 310,
+                'ph': 7.4,
+                'concentration': 1.5
+            }
+        },
+        'concepts': [
+            'protein folding as origami',
+            'chaos as creative destruction',
+            'molecular binding as lock and key'
+        ]
+    }
+    
+    results = orchestrator.run_full_pipeline(study_params)
+    print("\nPipeline complete!")
+    print(json.dumps(results, indent=2))
