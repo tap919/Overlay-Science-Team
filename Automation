@@ -1,0 +1,296 @@
+# science_pipeline_config.yaml
+# Configuration for the Scientific Production Pipeline
+
+workspace:
+  base_dir: "./science_workspace"
+  studies_dir: "./science_workspace/studies"
+  deliverables_dir: "./science_workspace/deliverables"
+  archive_dir: "./science_workspace/archive"
+
+# Tool configurations - Update these paths to your actual software
+tools:
+  glcce:
+    path: "./glcce/run_chaos_sim.sh"
+    type: "quantum_chaos"
+    capabilities:
+      - protein_folding
+      - chaos_analysis
+      - energy_landscapes
+    max_iterations: 10000
+    
+  digital_lab:
+    path: "./digital_lab/simulate.py"
+    type: "biotech_simulation"
+    capabilities:
+      - pathway_analysis
+      - binding_studies
+      - toxicity_screening
+    docker_image: "digital-lab:latest"
+    
+  book_lab:
+    path: "./book_lab/generate_paper.py"
+    type: "writing"
+    capabilities:
+      - research_papers
+      - book_chapters
+      - grant_proposals
+    output_formats:
+      - latex
+      - markdown
+      - docx
+      
+  comic_engine:
+    path: "./comic_engine/metaphor_gen.py"
+    type: "metaphor_generation"
+    capabilities:
+      - visual_metaphors
+      - concept_illustrations
+      - narrative_structures
+    style_presets:
+      - scientific_illustration
+      - conceptual_art
+      - educational_comics
+      
+  datalite:
+    path: "./datalite/analyze.py"
+    type: "analytics"
+    capabilities:
+      - statistical_analysis
+      - data_visualization
+      - insight_synthesis
+    database: "./datalite/analytics.db"
+
+# Agent team configuration
+agents:
+  source_ingester:
+    role: "Source Ingestion Specialist"
+    capabilities:
+      - pdf_parsing
+      - text_extraction
+      - metadata_extraction
+      - citation_parsing
+    memory_boost: 0.90
+    
+  quantum_runner:
+    role: "Quantum Chaos Analyst"
+    capabilities:
+      - simulation_design
+      - parameter_optimization
+      - results_interpretation
+    optimization_boost: 0.92
+    tools: ["glcce"]
+    
+  biotech_simulator:
+    role: "Biotech Simulation Engineer"
+    capabilities:
+      - experiment_design
+      - protocol_generation
+      - results_analysis
+    execution_boost: 0.95
+    tools: ["digital_lab", "datalite"]
+    
+  metaphor_writer:
+    role: "Scientific Writer & Metaphor Specialist"
+    capabilities:
+      - paper_writing
+      - chapter_writing
+      - metaphor_generation
+      - visualization_design
+    coordination_boost: 0.85
+    tools: ["book_lab", "comic_engine"]
+    
+  analytics_compiler:
+    role: "Analytics & Insight Synthesizer"
+    capabilities:
+      - statistical_analysis
+      - data_visualization
+      - hypothesis_generation
+      - trend_analysis
+    testing_boost: 0.88
+    tools: ["datalite"]
+
+# Pipeline stages configuration
+pipeline:
+  stages:
+    - id: "ingest"
+      name: "Source Ingestion"
+      agent: "source_ingester"
+      timeout: 300
+      retry: 2
+      
+    - id: "quantum"
+      name: "Quantum Chaos Analysis"
+      agent: "quantum_runner"
+      timeout: 1800
+      retry: 1
+      dependencies: ["ingest"]
+      
+    - id: "biotech"
+      name: "Biotech Simulation"
+      agent: "biotech_simulator"
+      timeout: 2400
+      retry: 1
+      dependencies: ["quantum"]
+      
+    - id: "insights"
+      name: "Insight Synthesis"
+      agent: "analytics_compiler"
+      timeout: 600
+      retry: 2
+      dependencies: ["biotech"]
+      
+    - id: "writing"
+      name: "Paper & Book Writing"
+      agent: "metaphor_writer"
+      timeout: 1200
+      retry: 2
+      dependencies: ["insights"]
+      
+    - id: "metaphor"
+      name: "Metaphor Enhancement"
+      agent: "metaphor_writer"
+      timeout: 600
+      retry: 1
+      dependencies: ["writing"]
+
+# Deliverable templates
+deliverables:
+  research_paper:
+    format: "latex"
+    template: "./templates/ieee_paper.tex"
+    sections:
+      - abstract
+      - introduction
+      - methods
+      - results
+      - discussion
+      - conclusion
+      - references
+    target_pages: 10-12
+    target_citations: 20-30
+    
+  book_chapter:
+    format: "markdown"
+    template: "./templates/book_chapter.md"
+    sections:
+      - opening
+      - main_content
+      - metaphors
+      - summary
+      - exercises
+    target_pages: 20-30
+    metaphor_count: 8-12
+    
+  analytics_dashboard:
+    format: "html"
+    template: "./templates/analytics.html"
+    components:
+      - summary_stats
+      - convergence_plots
+      - energy_landscapes
+      - pathway_diagrams
+      - hypothesis_cards
+    chart_library: "plotly"
+
+# Automation schedule
+automation:
+  # Morning processing
+  morning_run:
+    schedule: "0 6 * * *"  # 6 AM daily
+    action: "process_new_studies"
+    notify: true
+    
+  # Check for new sources every hour
+  source_check:
+    schedule: "0 * * * *"  # Every hour
+    action: "scan_input_folder"
+    auto_start: true
+    
+  # Nightly cleanup and archiving
+  nightly_cleanup:
+    schedule: "0 2 * * *"  # 2 AM daily
+    action: "archive_completed_studies"
+    retention_days: 30
+
+# Notification settings
+notifications:
+  enabled: true
+  methods:
+    - email
+    - desktop
+  events:
+    - study_complete
+    - deliverable_ready
+    - pipeline_error
+  email:
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    from: "science-pipeline@yourdomain.com"
+    to: ["your.email@domain.com"]
+
+# Integration with existing tools
+integrations:
+  nightshift:
+    enabled: true
+    json_spec_path: "./nightshift/science_tasks.json"
+    trigger_on: "new_study"
+    
+  overlay365:
+    enabled: true
+    sync_deliverables: true
+    project_mapping:
+      research_papers: "Research/Papers"
+      book_chapters: "Writing/Book"
+      analytics: "Data/Analytics"
+      
+  git:
+    enabled: true
+    auto_commit: true
+    repo_path: "./digital-uplift-lab"
+    commit_message_template: "Science Pipeline: {study_id} - {deliverable_count} deliverables"
+    create_pr: true
+
+# Performance optimization
+performance:
+  max_concurrent_studies: 3
+  max_agents_per_study: 6
+  cache_enabled: true
+  cache_ttl: 3600
+  
+# Low-spec deployment settings
+deployment:
+  target: "low_spec"
+  resource_limits:
+    cpu_cores: 2
+    memory_mb: 4096
+    disk_gb: 20
+  optimization:
+    lazy_loading: true
+    streaming_results: true
+    incremental_processing: true
+    compression: true
+
+# Database configuration
+database:
+  type: "sqlite"
+  path: "./science_workspace/pipeline.db"
+  tables:
+    - studies
+    - deliverables
+    - pipeline_runs
+    - agent_logs
+  backup:
+    enabled: true
+    schedule: "0 0 * * *"  # Daily at midnight
+    retention_days: 7
+
+# Logging
+logging:
+  level: "INFO"
+  format: "json"
+  outputs:
+    - console
+    - file
+  file_path: "./logs/science_pipeline.log"
+  rotation: "daily"
+  retention_days: 30
