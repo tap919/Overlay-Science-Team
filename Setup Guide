@@ -1,0 +1,493 @@
+# Science Production Pipeline - Complete Setup Guide
+
+## Overview
+
+Transform your morning routine from manual work to automated scientific production. Drop source files, get peer-ready papers, book chapters, and analytics by lunch.
+
+## System Architecture
+
+```
+Morning Inputs (Books, PDFs, Data)
+    ↓
+Source Ingestion Agent
+    ↓
+GLCCE (Quantum Chaos) → Digital Lab (Biotech) → DataLite (Analytics)
+    ↓                          ↓                         ↓
+Insight Synthesis
+    ↓
+Book Lab (Papers/Chapters) + Comic Engine (Metaphors)
+    ↓
+Timestamped Deliverables (Papers, Books, Analytics)
+```
+
+## Quick Start
+
+### 1. One-Line Deployment
+
+```bash
+curl -sSL https://your-repo/deploy.sh | bash
+```
+
+Or manually:
+
+```bash
+git clone https://github.com/yourusername/science-pipeline.git
+cd science-pipeline
+chmod +x deploy.sh
+./deploy.sh
+```
+
+### 2. Configuration
+
+Edit `~/science_pipeline/config/pipeline.env`:
+
+```bash
+# Add your API key
+export ANTHROPIC_API_KEY="sk-ant-your-key-here"
+
+# Update tool paths to YOUR software locations
+export GLCCE_PATH="/path/to/glcce/executable"
+export DIGITAL_LAB_PATH="/path/to/digital_lab/app"
+export BOOK_LAB_PATH="/path/to/book_lab/app"
+export COMIC_ENGINE_PATH="/path/to/comic_engine/app"
+```
+
+### 3. Capture UI Elements
+
+For each tool, capture screenshots of key UI elements:
+
+```bash
+# Run the capture helper
+python capture_ui_elements.py --tool glcce
+
+# This will guide you through capturing:
+# - Buttons (New, Run, Export, etc.)
+# - Input fields
+# - Results regions
+# - Status indicators
+```
+
+Screenshots are saved to `~/science_pipeline/ui_assets/[tool_name]/`
+
+### 4. Start Pipeline
+
+```bash
+cd ~/science_pipeline
+./quickstart.sh
+```
+
+Choose option 1 to start the file watcher for automatic processing.
+
+## Daily Workflow
+
+### Morning Routine (5 minutes)
+
+1. **Gather sources** - Download/collect research materials:
+   - Research papers (PDFs)
+   - Books (PDF/EPUB converted to PDF)
+   - Datasets (CSV, Excel)
+   - Your notes (TXT, Markdown)
+
+2. **Drop into input folder**:
+   ```bash
+   # Drag files to desktop shortcut, or:
+   cp ~/Downloads/*.pdf ~/science_workspace/input/
+   ```
+
+3. **Pipeline auto-starts** - Go make coffee ☕
+
+### By Lunch (Automated)
+
+Pipeline delivers to `~/science_workspace/deliverables/[study_id]/`:
+
+- **2-3 Research Papers** (LaTeX/PDF format)
+  - Full structure (abstract, methods, results, discussion)
+  - Citations included
+  - Ready for submission
+
+- **1 Book Chapter** (20-30 pages)
+  - Narrative style
+  - 8-12 visual metaphors
+  - Accessible explanations
+
+- **Analytics Dashboard** (HTML)
+  - Interactive charts
+  - Statistical summaries
+  - Hypothesis cards
+
+### Typical Output Structure
+
+```
+deliverables/
+└── study_20260123_060015/
+    ├── research_paper_1.pdf          # Quantum chaos analysis
+    ├── research_paper_2.pdf          # Biotech applications
+    ├── book_chapter_3.pdf            # Narrative explanation
+    ├── analytics_dashboard.html      # Interactive charts
+    ├── metaphors/
+    │   ├── protein_folding_origami.png
+    │   ├── chaos_creative_destruction.png
+    │   └── ...
+    └── raw_data/
+        ├── glcce_results.csv
+        ├── biotech_simulation.json
+        └── insights_synthesis.json
+```
+
+## Usage Examples
+
+### Example 1: Protein Folding Study
+
+**Morning (6:00 AM):**
+```bash
+# Drop files into input/
+- protein_structures_review.pdf
+- recent_folding_papers.pdf
+- experimental_data.csv
+```
+
+**Pipeline executes:**
+1. Extracts hypotheses and data from sources
+2. Runs GLCCE quantum chaos simulation (chaos_coefficient: 0.7)
+3. Runs Digital Lab protein interaction studies
+4. Synthesizes novel insights about chaos-driven folding
+5. Writes 2 papers + 1 chapter with metaphors
+6. Generates analytics dashboard
+
+**Lunch (12:00 PM):**
+- Paper 1: "Quantum Chaos Reveals Novel Protein Folding Pathways" (12 pages)
+- Paper 2: "Therapeutic Implications of Chaos-Informed Binding Studies" (8 pages)
+- Chapter: "The Origami of Life: When Chaos Creates Molecular Order" (24 pages)
+- Dashboard: Interactive folding energy landscapes
+
+### Example 2: Drug Discovery Pipeline
+
+**Input:**
+- compound_library.csv
+- target_protein_structure.pdb
+- recent_drug_discovery_reviews.pdf
+
+**Output:**
+- Paper: "High-Throughput Virtual Screening via Chaos-Enhanced Simulations"
+- Analytics: Binding affinity rankings, toxicity predictions
+- Book chapter: "From Chaos to Cure: Modern Drug Discovery"
+
+### Example 3: Multi-Study Day
+
+Run 3 separate studies:
+
+```bash
+# Study 1: Morning drop at 6 AM
+~/science_workspace/input/protein_folding/
+
+# Study 2: Afternoon drop at 1 PM
+~/science_workspace/input/cancer_pathways/
+
+# Study 3: Evening drop at 6 PM
+~/science_workspace/input/quantum_biology/
+
+# Each gets processed independently
+# Each gets own deliverables folder
+```
+
+## Advanced Features
+
+### Manual Control
+
+Run specific study manually:
+
+```bash
+source ~/science_pipeline/venv/bin/activate
+python ~/science_pipeline/backend/science_pipeline.py \
+    source1.pdf source2.pdf dataset.csv
+```
+
+### Custom Templates
+
+Create custom paper templates:
+
+```bash
+# Edit template
+nano ~/science_pipeline/templates/custom_paper.tex
+
+# Reference in config
+deliverables:
+  research_paper:
+    template: "./templates/custom_paper.tex"
+```
+
+### Multi-Agent Coordination
+
+Configure agent team in `config/science_pipeline_config.yaml`:
+
+```yaml
+agents:
+  quantum_runner:
+    optimization_boost: 0.95  # Increase for better results
+    max_iterations: 20000     # More thorough simulations
+```
+
+### Integration with Existing Tools
+
+#### Nightshift Integration
+
+Science pipeline works with your Nightshift dev crew:
+
+```json
+// nightshift/science_tasks.json
+{
+  "trigger": "new_study_complete",
+  "tasks": [
+    {
+      "agent": "code_documenter",
+      "action": "document_simulation_code",
+      "input": "study_results"
+    },
+    {
+      "agent": "test_engineer",
+      "action": "validate_statistical_significance",
+      "input": "analytics_data"
+    }
+  ]
+}
+```
+
+#### Overlay365 Sync
+
+Auto-sync deliverables to your Overlay365 projects:
+
+```yaml
+integrations:
+  overlay365:
+    enabled: true
+    sync_deliverables: true
+    project_mapping:
+      research_papers: "Research/Papers/2026"
+      book_chapters: "Writing/Book/Chapters"
+```
+
+## Troubleshooting
+
+### UI Automation Issues
+
+**Problem:** Agent can't find buttons in GLCCE
+
+**Solution:**
+```bash
+# Recapture UI elements with higher resolution
+python capture_ui_elements.py --tool glcce --confidence 0.9
+
+# Check screen resolution matches capture resolution
+xrandr  # Linux
+# Ensure same resolution during capture and runtime
+```
+
+### Pipeline Stalls
+
+**Problem:** Pipeline stops at quantum simulation stage
+
+**Solution:**
+```bash
+# Check logs
+tail -f ~/science_workspace/logs/science_pipeline.log
+
+# Increase timeout in config
+pipeline:
+  stages:
+    quantum:
+      timeout: 3600  # 1 hour instead of 30 min
+```
+
+### Memory Issues (Low-Spec Machines)
+
+**Problem:** Out of memory with multiple studies
+
+**Solution:**
+```yaml
+# config/science_pipeline_config.yaml
+performance:
+  max_concurrent_studies: 1  # Process one at a time
+  
+deployment:
+  optimization:
+    streaming_results: true  # Don't load all in memory
+    incremental_processing: true
+```
+
+## Performance Optimization
+
+### For Low-Spec Deployment
+
+Current settings optimized for:
+- 2 CPU cores
+- 4GB RAM
+- 20GB disk space
+
+```yaml
+deployment:
+  target: "low_spec"
+  resource_limits:
+    cpu_cores: 2
+    memory_mb: 4096
+```
+
+### Scaling Up
+
+For better performance on capable machines:
+
+```yaml
+performance:
+  max_concurrent_studies: 5
+  max_agents_per_study: 10
+
+deployment:
+  resource_limits:
+    cpu_cores: 8
+    memory_mb: 16384
+```
+
+## Maintenance
+
+### Daily
+
+- Check deliverables: `ls ~/science_workspace/deliverables/`
+- Review logs: `tail ~/science_workspace/logs/morning_run.log`
+
+### Weekly
+
+- Archive old studies:
+  ```bash
+  ~/science_pipeline/backend/archive_old_studies.sh --days 7
+  ```
+
+### Monthly
+
+- Update dependencies:
+  ```bash
+  source ~/science_pipeline/venv/bin/activate
+  pip install --upgrade anthropic pyautogui opencv-python
+  ```
+
+## Tips & Best Practices
+
+### 1. Source Quality Matters
+
+Better inputs → Better outputs:
+- Use high-quality PDFs (not scans when possible)
+- Include diverse sources (papers, books, data)
+- Mix theoretical and empirical sources
+
+### 2. Naming Conventions
+
+Organize input files for better results:
+
+```
+input/
+├── protein_folding_study/
+│   ├── theory_chaos_dynamics.pdf
+│   ├── experiment_folding_data.csv
+│   └── review_recent_methods.pdf
+```
+
+### 3. Iterative Refinement
+
+Use pipeline outputs as inputs for deeper studies:
+
+```bash
+# First run
+study_001/ → initial_papers.pdf
+
+# Extract key concepts, add to new study
+study_002/
+├── study_001/initial_papers.pdf
+├── deeper_investigation.pdf
+└── new_experiments.csv
+```
+
+### 4. Template Customization
+
+Create templates for your specific needs:
+
+```bash
+templates/
+├── ieee_paper.tex           # Standard research
+├── nature_format.tex        # High-impact journals
+├── grant_proposal.tex       # Funding applications
+├── book_chapter_technical.md
+└── book_chapter_popular.md
+```
+
+## Future Enhancements
+
+Planned features:
+
+- [ ] Real-time collaboration (multiple users)
+- [ ] Voice control ("Run protein study with chaos 0.8")
+- [ ] Mobile app for source upload
+- [ ] Auto-submission to arXiv/bioRxiv
+- [ ] Peer review simulation (AI reviewers provide feedback)
+- [ ] Citation network analysis
+- [ ] Auto-experiment design for follow-up studies
+
+## Support & Community
+
+- Documentation: https://docs.science-pipeline.io
+- Issues: https://github.com/yourusername/science-pipeline/issues
+- Discussions: https://github.com/yourusername/science-pipeline/discussions
+
+## License
+
+MIT License - See LICENSE file
+
+---
+
+## Appendix: Tool Integration Details
+
+### GLCCE Integration
+
+Key UI elements to capture:
+- `new_simulation.png` - New simulation button
+- `chaos_param_field.png` - Chaos coefficient input
+- `iterations_field.png` - Iterations input
+- `particles_field.png` - Particle count input
+- `run_button.png` - Start simulation button
+- `simulation_complete.png` - Completion indicator
+- `export_button.png` - Export results button
+
+Result regions (x, y, width, height):
+- Convergence rate: (800, 150, 150, 30)
+- Chaos metric: (800, 200, 150, 30)
+- Folding energy: (800, 250, 150, 30)
+
+### Digital Lab Integration
+
+Key UI elements:
+- `new_experiment.png`
+- `type_binding_study.png`
+- `type_pathway_analysis.png`
+- `simulate_button.png`
+- `simulation_done.png`
+
+### Book Lab Integration
+
+Key UI elements:
+- `new_document.png`
+- `template_research_paper.png`
+- `template_book_chapter.png`
+- `content_area.png`
+- `auto_format.png`
+- `export_pdf.png`
+
+### Comic Engine Integration
+
+Key UI elements:
+- `new_metaphor.png`
+- `concept_field.png`
+- `style_scientific.png`
+- `generate_button.png`
+- `metaphor_ready.png`
+- `save_image.png`
+
+---
+
+**Ready to transform your research workflow? Start with `./deploy.sh`**
