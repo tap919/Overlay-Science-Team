@@ -95,7 +95,7 @@ Custom language grammars for scientific data formats.
 ### 5. Code Snippets
 **Location**: `vscodium-extension/snippets/scientific-apis.json`
 
-12 pre-built snippets for common workflows:
+6 pre-built snippets for common workflows:
 
 **API Snippets**:
 - `pubchem-search` - Search PubChem for compounds
@@ -159,7 +159,7 @@ Complete example demonstrating the full workflow.
 
 ### Quantitative Improvements
 - **15+** Scientific APIs integrated (vs 7 originally)
-- **12** Code snippets for rapid development
+- **6** Code snippets for rapid development
 - **10** Command palette commands
 - **4** Custom sidebar views
 - **2** New language syntaxes
@@ -205,7 +205,7 @@ Complete example demonstrating the full workflow.
 **Resources Provided**:
 - 3 comprehensive guides (28KB total)
 - 1 working example project
-- 12 copy-paste code snippets
+- 6 copy-paste code snippets
 - 15+ API integrations with docs
 
 ## 🔧 Technical Excellence

@@ -22,7 +22,7 @@ A complete VSCodium/VSCode extension that integrates the science pipeline direct
 - `package.json` - Extension manifest with all contributions
 - `src/extension.js` - Main extension logic (23KB)
 - `src/intellisense.js` - IntelliSense provider for scientific APIs
-- `snippets/scientific-apis.json` - 12 code snippets for common workflows
+- `snippets/scientific-apis.json` - 6 code snippets for common workflows
 - `syntaxes/` - Syntax highlighting for science data formats
 - `README.md` - Complete extension documentation
 
@@ -81,12 +81,12 @@ Custom language grammars for scientific data formats.
 
 ### 5. Code Snippets
 
-12 pre-built code snippets for common scientific workflows.
+6 pre-built code snippets for common scientific workflows.
 
 **Categories:**
 - API Integration (pubchem-search, biopython-pubmed, biothings-gene)
 - Study Setup (science-pipeline-setup)
-- Simulation Configuration (quantum-sim-params, biotech-sim-setup)
+- Simulation Configuration (quantum-sim-params)
 - Data Analysis (data-analysis-pipeline)
 
 ### 6. Example Projects

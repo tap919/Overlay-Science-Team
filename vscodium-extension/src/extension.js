@@ -228,16 +228,15 @@ function setupFileWatchers(context) {
  * Start the science pipeline
  */
 async function startPipeline(studyId) {
-    const config = vscode.workspace.getConfiguration('overlay-science-lab');
     const workspaceFolders = vscode.workspace.workspaceFolders;
     
     if (!workspaceFolders) {
         vscode.window.showErrorMessage('No workspace folder open');
         return;
     }
-
-    const rootPath = workspaceFolders[0].uri.fsPath;
-    const backendScript = path.join(rootPath, 'Backend');
+    
+    // Register pipeline as active
+    activePipelines.set(studyId, { startTime: Date.now() });
     
     statusBarItem.text = `$(sync~spin) Science Lab: Running ${studyId}`;
     
@@ -285,6 +284,9 @@ async function startPipeline(studyId) {
         } else {
             statusBarItem.text = '$(warning) Science Lab: Cancelled';
         }
+
+        // Remove from active pipelines
+        activePipelines.delete(studyId);
 
         setTimeout(() => {
             statusBarItem.text = '$(beaker) Science Lab: Ready';
