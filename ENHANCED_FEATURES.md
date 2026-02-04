@@ -157,7 +157,7 @@ vscodium-extension/
 ## Usage Statistics
 
 - **15+ Scientific APIs** integrated
-- **12 Code Snippets** for common workflows
+- **6 Code Snippets** for common workflows
 - **10 Commands** in command palette
 - **4 Sidebar Views** for navigation
 - **2 Custom Languages** with syntax highlighting
