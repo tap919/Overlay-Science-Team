@@ -2,6 +2,7 @@ const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs').promises;
 const ScientificAPICompletionProvider = require('./intellisense');
+const { runAgenticWorkflow } = require('./agenticWorkflow');
 
 let statusBarItem;
 let activePipelines = new Map();
@@ -152,6 +153,17 @@ function registerCommands(context) {
     context.subscriptions.push(
         vscode.commands.registerCommand('overlay-science-lab.stopPipeline', async () => {
             await stopActivePipeline();
+        })
+    );
+
+    // Agentic automation workflow (end-to-end orchestration)
+    context.subscriptions.push(
+        vscode.commands.registerCommand('overlay-science-lab.runAgenticWorkflow', async () => {
+            await runAgenticWorkflow({
+                statusBarItem,
+                studyTreeProvider,
+                deliverableTreeProvider
+            });
         })
     );
 }
