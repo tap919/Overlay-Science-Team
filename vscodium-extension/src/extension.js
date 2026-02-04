@@ -201,9 +201,10 @@ function setupFileWatchers(context) {
         return;
     }
 
+    const workspacePath = config.get('workspacePath', 'science_workspace');
     const pattern = new vscode.RelativePattern(
         workspaceFolders[0],
-        '**/science_workspace/input/**/*'
+        `**/${workspacePath}/input/**/*`
     );
 
     const watcher = vscode.workspace.createFileSystemWatcher(pattern);
