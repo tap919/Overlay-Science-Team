@@ -135,7 +135,7 @@ class ScientificAPICompletionProvider {
         }
 
         // Detect function calls for specific modules
-        for (const [key, api] of Object.entries(this.apis)) {
+        for (const api of Object.values(this.apis)) {
             if (api.functions && linePrefix.includes(api.alias + '.')) {
                 api.functions.forEach(func => {
                     const item = new vscode.CompletionItem(func.name, vscode.CompletionItemKind.Function);
