@@ -297,22 +297,48 @@ def get_enhanced_apis() -> EnhancedScientificAPIs:
 
 
 if __name__ == "__main__":
-    # Demo usage
+    # Demo usage focused on automation bundles
     apis = EnhancedScientificAPIs()
-    
     print("=== Enhanced Scientific APIs ===\n")
     print(f"Total APIs available: {len(apis.list_all_apis())}\n")
-    
     for category in APICategory:
         category_apis = apis.get_by_category(category)
         print(f"{category.value.upper()}: {len(category_apis)} APIs")
-    
-    print("\n=== Installation Script ===")
-    print(apis.generate_installation_script())
-    
-    print("\n=== Example: PubChemPy ===")
-    pubchem = apis.get_api("pubchempy")
-    if pubchem:
-        print(f"Name: {pubchem.name}")
-        print(f"Description: {pubchem.description}")
-        print(f"Example:\n{pubchem.example_code}")
+    print("\n=== Open-Source Automation Bundles ===")
+    bundles = {
+        "literature_ingestion": {
+            "purpose": "Fetch and normalize papers plus metadata automatically",
+            "tools": "biopython, metapub, bioservices",
+            "install": "pip install biopython metapub bioservices"
+        },
+        "compound_and_target_mining": {
+            "purpose": "Rapidly search compounds, targets, and interactions for new hypotheses",
+            "tools": "pubchempy, chembl-downloader, rdkit-pypi, biothings-client",
+            "install": "pip install pubchempy chembl-downloader rdkit-pypi biothings-client"
+        },
+        "genomics_and_proteomics": {
+            "purpose": "Analyze sequences, variants, and protein structures in automated pipelines",
+            "tools": "pysam, scikit-bio, pybioportal, biopandas, prody",
+            "install": "pip install pysam scikit-bio pybioportal biopandas prody"
+        },
+        "analytics_and_insights": {
+            "purpose": "Turn raw outputs into dashboards and insight reports automatically",
+            "tools": "pandas, scipy, scikit-learn, plotly",
+            "install": "pip install pandas scipy scikit-learn plotly"
+        }
+    }
+    for name, bundle in bundles.items():
+        print(f"\n[{name}]")
+        print(f"Purpose : {bundle['purpose']}")
+        print(f"Tools   : {bundle['tools']}")
+        print(f"Install : {bundle['install']}")
+    print("\n=== Quickstart Script ===")
+    print("#!/usr/bin/env bash")
+    print("set -eo pipefail")
+    print("echo \"Installing open-source science automation stack...\"")
+    for bundle in bundles.values():
+        print(f"echo \"- {bundle['purpose']}\"")
+        print(bundle["install"])
+    print("echo \"Creating starter notebooks...\"")
+    print("python examples/protein-folding-study/study_setup.py 2>/dev/null || true")
+    print("echo \"Done. Launch your science lab!\"")

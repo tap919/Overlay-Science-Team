@@ -27,6 +27,7 @@
     "onStartupFinished",
     "onCommand:overlay-science-lab.startPipeline",
     "onCommand:overlay-science-lab.openDashboard",
+    "onCommand:overlay-science-lab.runAgenticWorkflow",
     "onLanguage:python",
     "workspaceContains:**/science_workspace"
   ],
@@ -92,6 +93,12 @@
         "title": "Stop Active Pipeline",
         "category": "Science Lab",
         "icon": "$(debug-stop)"
+      },
+      {
+        "command": "overlay-science-lab.runAgenticWorkflow",
+        "title": "Run Agentic Workflow",
+        "category": "Science Lab",
+        "icon": "$(rocket)"
       }
     ],
     "viewsContainers": {
