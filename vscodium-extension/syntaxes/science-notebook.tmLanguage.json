@@ -1,0 +1,62 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Science Notebook",
+  "patterns": [
+    {
+      "include": "#cell-markers"
+    },
+    {
+      "include": "#metadata"
+    },
+    {
+      "include": "source.python"
+    }
+  ],
+  "repository": {
+    "cell-markers": {
+      "patterns": [
+        {
+          "name": "meta.cell.markdown.science",
+          "begin": "^# %%\\s*\\[markdown\\]",
+          "end": "^(?=# %%)",
+          "patterns": [
+            {
+              "include": "text.html.markdown"
+            }
+          ]
+        },
+        {
+          "name": "meta.cell.code.science",
+          "begin": "^# %%",
+          "end": "^(?=# %%)",
+          "beginCaptures": {
+            "0": {
+              "name": "comment.line.cell-marker.science"
+            }
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "patterns": [
+        {
+          "name": "comment.line.metadata.science",
+          "match": "^# META:.*$"
+        },
+        {
+          "name": "comment.line.tags.science",
+          "match": "^# TAGS:.*$"
+        },
+        {
+          "name": "keyword.control.study-id.science",
+          "match": "^# STUDY_ID:\\s*(.+)$"
+        },
+        {
+          "name": "keyword.control.pipeline-stage.science",
+          "match": "^# STAGE:\\s*(ingestion|quantum|biotech|synthesis|writing|metaphor)$"
+        }
+      ]
+    }
+  },
+  "scopeName": "source.science-notebook"
+}
