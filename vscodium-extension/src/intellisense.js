@@ -175,7 +175,7 @@ class ScientificAPICompletionProvider {
         const word = document.getText(range);
 
         // Search for word in APIs
-        for (const [key, api] of Object.entries(this.apis)) {
+        for (const api of Object.values(this.apis)) {
             if (api.functions) {
                 const func = api.functions.find(f => f.name === word);
                 if (func) {
