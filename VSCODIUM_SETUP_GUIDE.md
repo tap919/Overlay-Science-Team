@@ -367,8 +367,7 @@ cat science_workspace/logs/pipeline.log
 {
   "overlay-science-lab.autoStartPipeline": true,
   "overlay-science-lab.enableRealTimeUpdates": true,
-  "overlay-science-lab.showAgentMetrics": true,
-  "overlay-science-lab.parallelPipelines": 5
+  "overlay-science-lab.showAgentMetrics": true
 }
 ```
 
