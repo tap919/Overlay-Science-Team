@@ -192,6 +192,32 @@
         "path": "./snippets/scientific-apis.json"
       }
     ],
+    "grammars": [
+      {
+        "language": "science-notebook",
+        "scopeName": "source.science-notebook",
+        "path": "./syntaxes/science-notebook.tmLanguage.json"
+      },
+      {
+        "language": "science-data",
+        "scopeName": "source.science-data",
+        "path": "./syntaxes/science-data.tmLanguage.json"
+      }
+    ],
+    "languages": [
+      {
+        "id": "science-notebook",
+        "aliases": ["Science Notebook", "science-notebook"],
+        "extensions": [".science-nb", ".snb"],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "science-data",
+        "aliases": ["Science Data", "science-data"],
+        "extensions": [".scidata", ".sdata"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
     "notebooks": [
       {
         "type": "science-notebook",

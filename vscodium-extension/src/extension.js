@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const { spawn } = require('child_process');
 const WebSocket = require('ws');
+const ScientificAPICompletionProvider = require('./intellisense');
 
 let statusBarItem;
 let activePipelines = new Map();
@@ -10,6 +11,7 @@ let studyTreeProvider;
 let deliverableTreeProvider;
 let toolsTreeProvider;
 let agentTreeProvider;
+let intellisenseProvider;
 
 /**
  * Extension activation entry point
@@ -34,6 +36,32 @@ function activate(context) {
     vscode.window.registerTreeDataProvider('deliverables', deliverableTreeProvider);
     vscode.window.registerTreeDataProvider('tools', toolsTreeProvider);
     vscode.window.registerTreeDataProvider('agents', agentTreeProvider);
+
+    // Register IntelliSense providers
+    intellisenseProvider = new ScientificAPICompletionProvider();
+    
+    context.subscriptions.push(
+        vscode.languages.registerCompletionItemProvider(
+            { scheme: 'file', language: 'python' },
+            intellisenseProvider,
+            '.'
+        )
+    );
+    
+    context.subscriptions.push(
+        vscode.languages.registerHoverProvider(
+            { scheme: 'file', language: 'python' },
+            intellisenseProvider
+        )
+    );
+    
+    context.subscriptions.push(
+        vscode.languages.registerSignatureHelpProvider(
+            { scheme: 'file', language: 'python' },
+            intellisenseProvider,
+            '(', ','
+        )
+    );
 
     // Register commands
     registerCommands(context);
