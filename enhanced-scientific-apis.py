@@ -334,11 +334,11 @@ if __name__ == "__main__":
         print(f"Install : {bundle['install']}")
     print("\n=== Quickstart Script ===")
     print("#!/usr/bin/env bash")
-    print("set -euo pipefail")
+    print("set -eo pipefail")
     print("echo \"Installing open-source science automation stack...\"")
     for bundle in bundles.values():
         print(f"echo \"- {bundle['purpose']}\"")
         print(bundle["install"])
     print("echo \"Creating starter notebooks...\"")
-    print("jupyter nbconvert --to notebook --execute examples/protein-folding-study/study_setup.py 2>/dev/null || true")
+    print("python examples/protein-folding-study/study_setup.py 2>/dev/null || true")
     print("echo \"Done. Launch your science lab!\"")
