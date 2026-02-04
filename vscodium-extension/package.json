@@ -1,0 +1,282 @@
+{
+  "name": "overlay-science-lab",
+  "displayName": "Overlay Science Lab",
+  "description": "VSCodium extension for the Overlay Science Team - Enhanced scientific research capabilities and IDE integration",
+  "version": "1.0.0",
+  "publisher": "overlay-science-team",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Data Science",
+    "Education",
+    "Notebooks",
+    "Other"
+  ],
+  "keywords": [
+    "science",
+    "research",
+    "biotech",
+    "quantum",
+    "lab",
+    "pipeline",
+    "data science",
+    "notebooks"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:overlay-science-lab.startPipeline",
+    "onCommand:overlay-science-lab.openDashboard",
+    "onLanguage:python",
+    "workspaceContains:**/science_workspace"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "overlay-science-lab.startPipeline",
+        "title": "Start Science Pipeline",
+        "category": "Science Lab",
+        "icon": "$(run)"
+      },
+      {
+        "command": "overlay-science-lab.openDashboard",
+        "title": "Open Science Dashboard",
+        "category": "Science Lab",
+        "icon": "$(dashboard)"
+      },
+      {
+        "command": "overlay-science-lab.newStudy",
+        "title": "Create New Study",
+        "category": "Science Lab",
+        "icon": "$(add)"
+      },
+      {
+        "command": "overlay-science-lab.uploadSources",
+        "title": "Upload Research Sources",
+        "category": "Science Lab",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "overlay-science-lab.viewDeliverables",
+        "title": "View Deliverables",
+        "category": "Science Lab",
+        "icon": "$(files)"
+      },
+      {
+        "command": "overlay-science-lab.runQuantumSim",
+        "title": "Run Quantum Chaos Simulation",
+        "category": "Science Lab",
+        "icon": "$(symbol-misc)"
+      },
+      {
+        "command": "overlay-science-lab.runBiotechSim",
+        "title": "Run Biotech Simulation",
+        "category": "Science Lab",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "overlay-science-lab.openNotebook",
+        "title": "Open Science Notebook",
+        "category": "Science Lab",
+        "icon": "$(notebook)"
+      },
+      {
+        "command": "overlay-science-lab.insertApiSnippet",
+        "title": "Insert Scientific API Snippet",
+        "category": "Science Lab",
+        "icon": "$(code)"
+      },
+      {
+        "command": "overlay-science-lab.stopPipeline",
+        "title": "Stop Active Pipeline",
+        "category": "Science Lab",
+        "icon": "$(debug-stop)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "science-lab",
+          "title": "Science Lab",
+          "icon": "resources/icons/science-lab.svg"
+        }
+      ]
+    },
+    "views": {
+      "science-lab": [
+        {
+          "id": "activeStudies",
+          "name": "Active Studies",
+          "icon": "$(pulse)",
+          "contextualTitle": "Active Studies"
+        },
+        {
+          "id": "deliverables",
+          "name": "Deliverables",
+          "icon": "$(file-text)",
+          "contextualTitle": "Research Outputs"
+        },
+        {
+          "id": "tools",
+          "name": "Scientific Tools",
+          "icon": "$(tools)",
+          "contextualTitle": "Tools & APIs"
+        },
+        {
+          "id": "agents",
+          "name": "Pipeline Agents",
+          "icon": "$(organization)",
+          "contextualTitle": "Agent Status"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Overlay Science Lab",
+      "properties": {
+        "overlay-science-lab.workspacePath": {
+          "type": "string",
+          "default": "./science_workspace",
+          "description": "Path to science workspace directory"
+        },
+        "overlay-science-lab.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Anthropic API key for agent intelligence"
+        },
+        "overlay-science-lab.glccePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to GLCCE executable"
+        },
+        "overlay-science-lab.digitalLabPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Digital Lab application"
+        },
+        "overlay-science-lab.bookLabPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Book Lab application"
+        },
+        "overlay-science-lab.comicEnginePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Comic Engine application"
+        },
+        "overlay-science-lab.autoStartPipeline": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically start pipeline when sources are added"
+        },
+        "overlay-science-lab.enableRealTimeUpdates": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show real-time progress updates in status bar"
+        },
+        "overlay-science-lab.notebookIntegration": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Jupyter notebook integration"
+        },
+        "overlay-science-lab.showAgentMetrics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Display agent performance metrics"
+        }
+      }
+    },
+    "snippets": [
+      {
+        "language": "python",
+        "path": "./snippets/scientific-apis.json"
+      }
+    ],
+    "notebooks": [
+      {
+        "type": "science-notebook",
+        "displayName": "Science Lab Notebook",
+        "selector": [
+          {
+            "filenamePattern": "*.science-nb"
+          }
+        ]
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "overlay-science-lab.startPipeline",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "overlay-science-lab.openDashboard",
+          "when": "workspaceFolderCount > 0"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "overlay-science-lab.newStudy",
+          "when": "view == activeStudies",
+          "group": "navigation"
+        },
+        {
+          "command": "overlay-science-lab.uploadSources",
+          "when": "view == activeStudies",
+          "group": "navigation"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "overlay-science-lab.openDashboard",
+          "when": "resourceExtname == .science-nb",
+          "group": "navigation"
+        }
+      ]
+    },
+    "taskDefinitions": [
+      {
+        "type": "science-pipeline",
+        "required": [
+          "command"
+        ],
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "Pipeline command to execute"
+          },
+          "studyId": {
+            "type": "string",
+            "description": "Study identifier"
+          }
+        }
+      }
+    ],
+    "problemMatchers": [
+      {
+        "name": "science-pipeline",
+        "owner": "overlay-science-lab",
+        "fileLocation": "relative",
+        "pattern": {
+          "regexp": "^(ERROR|WARNING):\\s+(.+)$",
+          "severity": 1,
+          "message": 2
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "node ./test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/node": "^18.x",
+    "eslint": "^8.45.0"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "ws": "^8.13.0"
+  }
+}

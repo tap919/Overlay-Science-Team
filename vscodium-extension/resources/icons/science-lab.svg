@@ -1,0 +1,19 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Beaker/Flask shape -->
+  <path d="M24 8 h16 v16 l8 24 q2 6 -2 10 h-28 q-4 -4 -2 -10 l8 -24 Z" fill="#4A90E2" stroke="#2563EB" stroke-width="2"/>
+  
+  <!-- Liquid inside -->
+  <path d="M26 28 l6 18 q2 4 0 6 h-16 q-2 -2 0 -6 l6 -18" fill="#60A5FA" opacity="0.7"/>
+  
+  <!-- Bubbles -->
+  <circle cx="28" cy="42" r="2" fill="white" opacity="0.5"/>
+  <circle cx="36" cy="38" r="2.5" fill="white" opacity="0.5"/>
+  <circle cx="32" cy="46" r="1.5" fill="white" opacity="0.5"/>
+  
+  <!-- Atom symbol overlay -->
+  <g transform="translate(42, 14)">
+    <circle cx="0" cy="0" r="2" fill="#60A5FA"/>
+    <ellipse cx="0" cy="0" rx="8" ry="3" stroke="#60A5FA" stroke-width="1.5" fill="none" transform="rotate(45)"/>
+    <ellipse cx="0" cy="0" rx="8" ry="3" stroke="#60A5FA" stroke-width="1.5" fill="none" transform="rotate(-45)"/>
+  </g>
+</svg>
