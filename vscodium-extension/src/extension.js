@@ -1,8 +1,6 @@
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs').promises;
-const { spawn } = require('child_process');
-const WebSocket = require('ws');
 const ScientificAPICompletionProvider = require('./intellisense');
 
 let statusBarItem;
