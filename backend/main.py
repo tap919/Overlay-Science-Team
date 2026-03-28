@@ -169,16 +169,48 @@ async def get_studies():
 @app.websocket("/ws/executions/{execution_id}")
 async def websocket_endpoint(websocket: WebSocket, execution_id: str):
     await websocket.accept()
+
+    # Validate that the execution exists before registering the connection
+    if execution_id not in executions_db:
+        await websocket.send_json({"error": "Execution not found", "execution_id": execution_id})
+        await websocket.close()
+        return
+
     if execution_id not in active_connections:
         active_connections[execution_id] = []
     active_connections[execution_id].append(websocket)
+
     try:
+        # Stream execution updates until a terminal status is reached or the execution disappears
         while True:
-            if execution_id in executions_db:
-                await websocket.send_json(executions_db[execution_id])
+            exec_data = executions_db.get(execution_id)
+            if not exec_data:
+                # Execution no longer tracked; stop streaming
+                break
+
+            await websocket.send_json(exec_data)
+
+            status = exec_data.get("status")
+            if status in {"success", "failed", "error", "cancelled"}:
+                # Execution has reached a terminal state; close the connection
+                break
+
             await asyncio.sleep(1)
     except WebSocketDisconnect:
-        active_connections[execution_id].remove(websocket)
+        # Client disconnected; cleanup handled in finally
+        pass
+    finally:
+        # Ensure the websocket is removed from active connections
+        connections = active_connections.get(execution_id)
+        if connections and websocket in connections:
+            connections.remove(websocket)
+            if not connections:
+                active_connections.pop(execution_id, None)
+        try:
+            await websocket.close()
+        except Exception:
+            # Ignore errors during cleanup close
+            pass
 
 
 async def run_pipeline(execution_id: str, study_id: str, study_type: str):
