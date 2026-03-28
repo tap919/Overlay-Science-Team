@@ -4,9 +4,13 @@ Overlay Science Team - Backend API
 Full-stack agentic science team with CIS Assistant integration
 """
 import asyncio
+import importlib.util
+import json
 import os
+import sys
 import uuid
 from datetime import datetime
+from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Any
 import logging
@@ -43,6 +47,7 @@ app.add_middleware(
 
 WORKSPACE = Path("./science_workspace")
 WORKSPACE.mkdir(exist_ok=True)
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # In-memory storage
 studies_db: Dict[str, Any] = {}
@@ -81,6 +86,58 @@ PIPELINE_STAGES = [
     {"id": "writing", "name": "Paper & Book Writing", "agent_id": "writer-agent", "order": 5},
     {"id": "metaphor", "name": "Metaphor Enhancement", "agent_id": "metaphor-agent", "order": 6},
 ]
+
+
+@lru_cache(maxsize=1)
+def _load_digital_lab_tools() -> List[dict]:
+    tools_path = REPO_ROOT / "Digital Lab tools"
+    try:
+        with tools_path.open("r", encoding="utf-8") as handle:
+            return json.load(handle)
+    except (FileNotFoundError, json.JSONDecodeError):
+        logging.exception("Failed to load digital lab tools from %s", tools_path)
+        return []
+
+
+@lru_cache(maxsize=1)
+def _load_enhanced_api_catalog() -> dict:
+    module_path = REPO_ROOT / "enhanced-scientific-apis.py"
+    try:
+        spec = importlib.util.spec_from_file_location("overlay_enhanced_scientific_apis", module_path)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Unable to load scientific API module from {module_path}")
+
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = module
+        spec.loader.exec_module(module)
+
+        catalog = module.get_enhanced_apis()
+        apis = []
+        category_counts: Dict[str, int] = {}
+
+        for api_id, api in sorted(catalog.apis.items(), key=lambda item: item[1].name.lower()):
+            category = api.category.value
+            category_counts[category] = category_counts.get(category, 0) + 1
+            apis.append({
+                "id": api_id,
+                "name": api.name,
+                "category": category,
+                "description": api.description,
+                "install": api.install_command,
+                "example": api.example_code,
+                "docs": api.documentation_url,
+                "github": api.github_url,
+                "requires_api_key": api.requires_api_key,
+            })
+
+        categories = [
+            {"id": category, "name": category.replace("_", " ").title(), "count": count}
+            for category, count in sorted(category_counts.items())
+        ]
+        return {"apis": apis, "categories": categories}
+    except Exception:
+        logging.exception("Failed to load enhanced scientific APIs from %s", module_path)
+        return {"apis": [], "categories": []}
 
 
 @app.get("/")
@@ -296,6 +353,22 @@ async def get_cis_principles():
         {"id": "efficient_resource_flow", "name": "Efficient Resource Flow", "description": "Resources flow to where they're needed. Demand drives allocation.", "icon": "⚡"},
     ]
     return {"principles": principles}
+
+
+@app.get("/api/v1/cis/capabilities")
+async def get_cis_capabilities():
+    digital_lab_tools = _load_digital_lab_tools()
+    api_catalog = _load_enhanced_api_catalog()
+    return {
+        "digital_lab_tools": digital_lab_tools,
+        "enhanced_apis": api_catalog["apis"],
+        "api_categories": api_catalog["categories"],
+        "summary": {
+            "digital_lab_tool_count": len(digital_lab_tools),
+            "enhanced_api_count": len(api_catalog["apis"]),
+            "api_category_count": len(api_catalog["categories"]),
+        }
+    }
 
 
 @app.get("/api/v1/health")

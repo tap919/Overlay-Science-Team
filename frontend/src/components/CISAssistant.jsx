@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react'
 
 export default function CISAssistant({ apiBase }) {
   const [principles, setPrinciples] = useState([])
+  const [capabilities, setCapabilities] = useState({
+    digital_lab_tools: [],
+    enhanced_apis: [],
+    api_categories: [],
+    summary: null,
+  })
   const [selectedPrinciple, setSelectedPrinciple] = useState(null)
   const [contractInput, setContractInput] = useState('')
   const [contractOutput, setContractOutput] = useState('')
@@ -10,9 +16,19 @@ export default function CISAssistant({ apiBase }) {
   const [activeSection, setActiveSection] = useState('principles')
 
   useEffect(() => {
-    fetch(`${apiBase}/cis/principles`)
-      .then(r => r.json())
-      .then(d => setPrinciples(d.principles || []))
+    Promise.all([
+      fetch(`${apiBase}/cis/principles`).then(r => r.json()),
+      fetch(`${apiBase}/cis/capabilities`).then(r => r.json()),
+    ])
+      .then(([principlesData, capabilitiesData]) => {
+        setPrinciples(principlesData.principles || [])
+        setCapabilities({
+          digital_lab_tools: capabilitiesData.digital_lab_tools || [],
+          enhanced_apis: capabilitiesData.enhanced_apis || [],
+          api_categories: capabilitiesData.api_categories || [],
+          summary: capabilitiesData.summary || null,
+        })
+      })
       .catch(console.error)
   }, [apiBase])
 
@@ -72,6 +88,7 @@ interface ${safeName}Contract {
 
   const SECTION_TABS = [
     { id: 'principles', label: '📖 Seven Principles' },
+    { id: 'tooling', label: '🧪 Lab Tools & APIs' },
     { id: 'contracts', label: '📋 Contract Generator' },
     { id: 'validation', label: '✅ Code Validation' },
   ]
@@ -113,6 +130,130 @@ interface ${safeName}Contract {
               <p className="text-sm text-slate-400 leading-relaxed">{p.description}</p>
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Contract Generator */}
+      {activeSection === 'tooling' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                label: 'Digital Lab Tools',
+                value: capabilities.summary?.digital_lab_tool_count ?? capabilities.digital_lab_tools.length,
+                tone: 'text-emerald-300',
+              },
+              {
+                label: 'Enhanced APIs',
+                value: capabilities.summary?.enhanced_api_count ?? capabilities.enhanced_apis.length,
+                tone: 'text-indigo-300',
+              },
+              {
+                label: 'API Categories',
+                value: capabilities.summary?.api_category_count ?? capabilities.api_categories.length,
+                tone: 'text-amber-300',
+              },
+            ].map(card => (
+              <div key={card.label} className="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                <p className="text-sm text-slate-400">{card.label}</p>
+                <p className={`text-3xl font-bold mt-2 ${card.tone}`}>{card.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+            <h2 className="text-lg font-semibold text-indigo-300">🧬 Digital Lab Tooling</h2>
+            <p className="text-sm text-slate-400 mt-1">
+              Curated biotech and bioinformatics tools ready to support CIS-guided digital lab workflows.
+            </p>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {capabilities.digital_lab_tools.map(tool => (
+                <div key={tool.name} className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 space-y-3">
+                  <div>
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="font-semibold text-slate-100">{tool.name}</h3>
+                      <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                        {tool.category}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-400 mt-2">{tool.description}</p>
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    <span className="text-slate-400">Install:</span> {tool.install}
+                  </div>
+                  <pre className="bg-slate-950 rounded-lg p-3 text-xs text-emerald-300 overflow-x-auto whitespace-pre-wrap border border-slate-800">
+                    {tool.example}
+                  </pre>
+                  <div className="flex gap-4 text-sm">
+                    <a className="text-indigo-300 hover:text-indigo-200" href={tool.docs} target="_blank" rel="noreferrer">
+                      Documentation ↗
+                    </a>
+                    <a className="text-slate-300 hover:text-slate-200" href={tool.github} target="_blank" rel="noreferrer">
+                      GitHub ↗
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-semibold text-indigo-300 mr-2">🔌 Enhanced Scientific APIs</h2>
+              {capabilities.api_categories.map(category => (
+                <span
+                  key={category.id}
+                  className="text-xs px-2 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
+                >
+                  {category.name} · {category.count}
+                </span>
+              ))}
+            </div>
+            <p className="text-sm text-slate-400 mt-3">
+              Expanded API coverage for compounds, literature, genes, proteins, chemistry, and genomics workflows.
+            </p>
+            <div className="mt-4 space-y-3">
+              {capabilities.enhanced_apis.map(api => (
+                <details
+                  key={api.id}
+                  className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 group"
+                >
+                  <summary className="cursor-pointer list-none flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div>
+                      <h3 className="font-semibold text-slate-100">{api.name}</h3>
+                      <p className="text-sm text-slate-400 mt-1">{api.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="px-2 py-1 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                        {api.category.replace('_', ' ')}
+                      </span>
+                      {api.requires_api_key && (
+                        <span className="px-2 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                          API key required
+                        </span>
+                      )}
+                    </div>
+                  </summary>
+                  <div className="mt-4 space-y-3">
+                    <div className="text-xs text-slate-500">
+                      <span className="text-slate-400">Install:</span> {api.install}
+                    </div>
+                    <pre className="bg-slate-950 rounded-lg p-3 text-xs text-emerald-300 overflow-x-auto whitespace-pre-wrap border border-slate-800">
+                      {api.example}
+                    </pre>
+                    <div className="flex gap-4 text-sm">
+                      <a className="text-indigo-300 hover:text-indigo-200" href={api.docs} target="_blank" rel="noreferrer">
+                        Documentation ↗
+                      </a>
+                      <a className="text-slate-300 hover:text-slate-200" href={api.github} target="_blank" rel="noreferrer">
+                        GitHub ↗
+                      </a>
+                    </div>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
