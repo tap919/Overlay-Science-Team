@@ -26,10 +26,20 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# CORS configuration: use an explicit allowlist, configurable via environment variables.
+cors_origins_env = os.getenv("CORS_ALLOW_ORIGINS")
+if cors_origins_env:
+    allowed_origins = [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()]
+else:
+    # Safe defaults for local development; adjust via CORS_ALLOW_ORIGINS in production.
+    allowed_origins = ["http://localhost", "http://localhost:3000"]
+
+allow_credentials = os.getenv("CORS_ALLOW_CREDENTIALS", "false").lower() == "true"
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
