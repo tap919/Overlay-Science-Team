@@ -100,11 +100,17 @@ async def upload_files(study_id: str, files: List[UploadFile] = File(...)):
 
     uploaded = []
     for file in files:
+        # Sanitize filename to prevent path traversal
+        original_filename = file.filename or ""
+        safe_filename = Path(original_filename).name
+        if not safe_filename or safe_filename in (".", ".."):
+            raise HTTPException(status_code=400, detail="Invalid filename")
+
         content = await file.read()
-        file_path = study_dir / file.filename
+        file_path = study_dir / safe_filename
         with open(file_path, "wb") as f:
             f.write(content)
-        uploaded.append({"filename": file.filename, "size": len(content), "path": str(file_path)})
+        uploaded.append({"filename": safe_filename, "size": len(content), "path": str(file_path)})
 
     studies_db[study_id] = {
         "id": study_id,
