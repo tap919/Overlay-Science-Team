@@ -19,3 +19,5 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    environment:
+      - VITE_API_BASE=http://backend:8000/api/v1
