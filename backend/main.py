@@ -4,21 +4,17 @@ Overlay Science Team - Backend API
 Full-stack agentic science team with CIS Assistant integration
 """
 import asyncio
-import json
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 import logging
-import os
 
 from fastapi import FastAPI, WebSocket, UploadFile, File, HTTPException, WebSocketDisconnect
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Overlay Science Team API",
