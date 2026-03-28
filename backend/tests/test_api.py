@@ -1,5 +1,4 @@
 """Tests for the Overlay Science Team API"""
-import pytest
 from pathlib import Path
 from fastapi.testclient import TestClient
 import sys
