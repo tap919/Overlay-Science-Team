@@ -88,7 +88,7 @@ interface ${safeName}Contract {
 
   const SECTION_TABS = [
     { id: 'principles', label: '📖 Seven Principles' },
-    { id: 'tooling', label: '🧪 Lab Tools & APIs' },
+    { id: 'lab_tools_apis', label: '🧪 Lab Tools & APIs' },
     { id: 'contracts', label: '📋 Contract Generator' },
     { id: 'validation', label: '✅ Code Validation' },
   ]
@@ -133,8 +133,8 @@ interface ${safeName}Contract {
         </div>
       )}
 
-      {/* Contract Generator */}
-      {activeSection === 'tooling' && (
+      {/* Lab Tools & APIs */}
+      {activeSection === 'lab_tools_apis' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
