@@ -45,6 +45,22 @@ def test_get_cis_principles():
     assert len(data["principles"]) == 7
 
 
+def test_get_cis_capabilities():
+    resp = client.get("/api/v1/cis/capabilities")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "digital_lab_tools" in data
+    assert "enhanced_apis" in data
+    assert "api_categories" in data
+    assert "summary" in data
+    assert len(data["digital_lab_tools"]) > 0
+    assert len(data["enhanced_apis"]) > 0
+    assert data["summary"]["digital_lab_tool_count"] == len(data["digital_lab_tools"])
+    assert data["summary"]["enhanced_api_count"] == len(data["enhanced_apis"])
+    assert any(tool["name"] == "PubChemPy" for tool in data["digital_lab_tools"])
+    assert any(api["name"] == "PubChemPy" for api in data["enhanced_apis"])
+
+
 def test_health():
     resp = client.get("/api/v1/health")
     assert resp.status_code == 200
