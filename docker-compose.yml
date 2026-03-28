@@ -1,5 +1,4 @@
-version: '3.8'
-# Note: the 'version' key is obsolete in modern Docker Compose but kept for compatibility
+# docker-compose.yml — compatible with Docker Compose v2.x and later (version key omitted per Compose v2 spec)
 services:
   backend:
     build:

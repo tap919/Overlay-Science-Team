@@ -4,7 +4,7 @@ import CrossDisciplinaryAgents from './components/CrossDisciplinaryAgents'
 import CISAssistant from './components/CISAssistant'
 import CirculatoryInformatics from './components/CirculatoryInformatics'
 
-const API_BASE = 'http://localhost:8000/api/v1'
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000/api/v1'
 
 const TABS = [
   { id: 'pipeline', label: '🔬 Science Pipeline' },
