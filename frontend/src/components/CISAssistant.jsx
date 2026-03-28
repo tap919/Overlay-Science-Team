@@ -18,13 +18,19 @@ export default function CISAssistant({ apiBase }) {
 
   const generateContract = () => {
     if (!contractInput.trim()) return
+    // Sanitize to a valid TypeScript identifier:
+    // 1. Replace whitespace and hyphens with underscores
+    // 2. Strip any remaining non-alphanumeric/underscore characters
+    // 3. Prepend underscore if the result starts with a digit
+    const rawName = contractInput.trim().replace(/[\s-]+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')
+    const safeName = /^\d/.test(rawName) ? `_${rawName}` : (rawName || 'Unnamed')
     // Simulate contract generation
     setContractOutput(`/**
  * CIS Contract: ${contractInput.trim()}
  * Generated: ${new Date().toISOString()}
  * Principle: Distributed Autonomy + Feedback-Driven Adaptation
  */
-interface ${contractInput.replace(/\s+/g, '')}Contract {
+interface ${safeName}Contract {
   // Input specification
   inputs: {
     data: unknown;

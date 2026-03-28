@@ -4,6 +4,7 @@ Overlay Science Team - Backend API
 Full-stack agentic science team with CIS Assistant integration
 """
 import asyncio
+import os
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -47,6 +48,9 @@ WORKSPACE.mkdir(exist_ok=True)
 studies_db: Dict[str, Any] = {}
 executions_db: Dict[str, Any] = {}
 active_connections: Dict[str, List[WebSocket]] = {}
+
+# Lock for safe concurrent updates to shared agent state
+_agents_lock = asyncio.Lock()
 
 # --- Science Team Agents ---
 AGENTS = [
@@ -225,10 +229,11 @@ async def run_pipeline(execution_id: str, study_id: str, study_type: str):
         exec_data["message"] = f"Running {stage['name']}..."
         exec_data["stages"][stage_id] = {"status": "running", "progress": 0, "started_at": datetime.now().isoformat()}
 
-        # Update agent status
-        for agent in AGENTS:
-            if agent["id"] == stage["agent_id"]:
-                agent["status"] = "busy"
+        # Update agent status — protected by lock to prevent concurrent-execution races
+        async with _agents_lock:
+            for agent in AGENTS:
+                if agent["id"] == stage["agent_id"]:
+                    agent["status"] = "busy"
 
         # Simulate stage execution in steps
         for pct in range(0, 101, 20):
@@ -241,11 +246,12 @@ async def run_pipeline(execution_id: str, study_id: str, study_type: str):
         exec_data["stages"][stage_id]["completed_at"] = datetime.now().isoformat()
         exec_data["stages"][stage_id]["result"] = _generate_stage_result(stage_id, study_id)
 
-        # Reset agent status
-        for agent in AGENTS:
-            if agent["id"] == stage["agent_id"]:
-                agent["status"] = "idle"
-                agent["memory"]["successful_tasks"] += 1
+        # Reset agent status — protected by lock
+        async with _agents_lock:
+            for agent in AGENTS:
+                if agent["id"] == stage["agent_id"]:
+                    agent["status"] = "idle"
+                    agent["memory"]["successful_tasks"] += 1
 
     exec_data["status"] = "success"
     exec_data["progress"] = 100

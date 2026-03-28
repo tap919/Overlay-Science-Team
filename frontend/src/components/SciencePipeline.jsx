@@ -33,6 +33,16 @@ export default function SciencePipeline({ apiBase, agents }) {
       .catch(console.error)
   }, [apiBase])
 
+  // Close the WebSocket when the component unmounts to prevent stale connections
+  useEffect(() => {
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close()
+        wsRef.current = null
+      }
+    }
+  }, [])
+
   const startPipeline = async () => {
     setLoading(true)
     try {
