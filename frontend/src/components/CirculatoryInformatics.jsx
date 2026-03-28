@@ -105,7 +105,10 @@ export default function CirculatoryInformatics({ agents, health }) {
         <div className="mt-4 flex items-center gap-6 text-sm text-slate-400 border-t border-slate-700 pt-4">
           <span>🟢 {idleAgents} idle</span>
           <span>🔵 {busyAgents} active</span>
-          <span>🧠 Avg confidence: {avgConfidence}%</span>
+          <span>
+            🧠 Avg confidence:{' '}
+            {typeof avgConfidence === 'number' ? `${avgConfidence}%` : avgConfidence}
+          </span>
         </div>
       </div>
 
