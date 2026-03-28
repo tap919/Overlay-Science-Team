@@ -16,18 +16,39 @@ export default function CISAssistant({ apiBase }) {
   const [activeSection, setActiveSection] = useState('principles')
 
   useEffect(() => {
-    Promise.all([
-      fetch(`${apiBase}/cis/principles`).then(r => r.json()),
-      fetch(`${apiBase}/cis/capabilities`).then(r => r.json()),
+    Promise.allSettled([
+      fetch(`${apiBase}/cis/principles`).then(r => {
+        if (!r.ok) {
+          throw new Error(`Failed to fetch principles: ${r.status} ${r.statusText}`)
+        }
+        return r.json()
+      }),
+      fetch(`${apiBase}/cis/capabilities`).then(r => {
+        if (!r.ok) {
+          throw new Error(`Failed to fetch capabilities: ${r.status} ${r.statusText}`)
+        }
+        return r.json()
+      }),
     ])
-      .then(([principlesData, capabilitiesData]) => {
-        setPrinciples(principlesData.principles || [])
-        setCapabilities({
-          digital_lab_tools: capabilitiesData.digital_lab_tools || [],
-          enhanced_apis: capabilitiesData.enhanced_apis || [],
-          api_categories: capabilitiesData.api_categories || [],
-          summary: capabilitiesData.summary || null,
-        })
+      .then(([principlesResult, capabilitiesResult]) => {
+        if (principlesResult.status === 'fulfilled') {
+          const principlesData = principlesResult.value
+          setPrinciples(principlesData.principles || [])
+        } else {
+          console.error(principlesResult.reason)
+        }
+
+        if (capabilitiesResult.status === 'fulfilled') {
+          const capabilitiesData = capabilitiesResult.value
+          setCapabilities({
+            digital_lab_tools: capabilitiesData.digital_lab_tools || [],
+            enhanced_apis: capabilitiesData.enhanced_apis || [],
+            api_categories: capabilitiesData.api_categories || [],
+            summary: capabilitiesData.summary || null,
+          })
+        } else {
+          console.error(capabilitiesResult.reason)
+        }
       })
       .catch(console.error)
   }, [apiBase])
